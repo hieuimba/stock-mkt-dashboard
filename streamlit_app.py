@@ -41,6 +41,11 @@ def query_prices(tickers_list):
     return st.session_state[query]
 
 
+date_timestamp = query("SELECT MAX([DATE]) AS Date FROM raw.prices")["Date"][0]
+unique_tickers = query("SELECT COUNT(DISTINCT ticker) AS Count FROM raw.prices")["Count"][0]
+st.caption(f"Looking at {unique_tickers} active tickers from NASDAQ, AMEX, and NYSE. Prices data as of {date_timestamp}")
+
+
 mkt_his = query("select * from visual.MktHistogram")
 mkt_rank = query("select * from visual.MktRanking")
 
@@ -92,7 +97,4 @@ for i, signal in enumerate(signals):
         with tab_two:
             st.data_editor(df_mkt_rank_lowest, column_config={"PriceHistory":st.column_config.LineChartColumn("Price (last 21 days)")}, hide_index=True, use_container_width=True)
 
-date_timestamp = query("SELECT MAX([DATE]) AS Date FROM raw.prices")["Date"][0]
-unique_tickers = query("SELECT COUNT(DISTINCT ticker) AS Count FROM raw.prices")["Count"][0]
-st.caption(f"Looking at {unique_tickers} active tickers from NASDAQ, AMEX, and NYSE. Prices data as of {date_timestamp}")
 
