@@ -12,12 +12,11 @@ url = st.secrets["DB_URL"]
 def query(query):
     request = {"query": query}
     response = json.loads(requests.post(url, json=request).content.decode('utf-8'))
-    df = pd.DataFrame(response)
 
     if query not in st.session_state:
-        st.session_state[query] = df
+        st.session_state[query] = response
 
-    return st.session_state[query]
+    return pd.DataFrame(st.session_state[query])
 
 @st.cache_data
 def query_prices(tickers_list):
