@@ -6,7 +6,7 @@ import plotly.express as px
 st.set_page_config(layout="wide")
 
 # Define the URL and payload for the POST request
-url = "https://prod-10.canadacentral.logic.azure.com:443/workflows/24595df23126448d91009e2f8d8256df/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ASNBMByBUMa_SkvckEp8YK8b6VX-U_DcYI7UqZHUXCE"
+url = st.secrets["DB_URL"]
 
 @st.cache_data
 def query(query):
