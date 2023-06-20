@@ -43,7 +43,7 @@ def query_prices(tickers_list):
 
 date_timestamp = query("SELECT MAX([DATE]) AS Date FROM raw.prices")["Date"][0]
 unique_tickers = query("SELECT COUNT(DISTINCT ticker) AS Count FROM raw.prices")["Count"][0]
-st.caption(f"Looking at {unique_tickers} active tickers from NASDAQ, AMEX, and NYSE. Prices data as of {date_timestamp}")
+st.caption(f"Looking at {unique_tickers} active tickers from NASDAQ, AMEX, and NYSE. Data as of {date_timestamp}")
 
 
 mkt_his = query("select * from visual.MktHistogram")
