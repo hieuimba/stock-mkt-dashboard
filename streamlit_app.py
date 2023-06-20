@@ -51,10 +51,9 @@ mkt_rank = query("select * from visual.MktRanking")
 signals = mkt_his['Signal'].unique()
 
 stock_his = mkt_his[mkt_his["SecType"] == "Stock"]
-
 stock_rank = mkt_rank[mkt_rank["SecType"] == "Stock"]
-price_history = query_prices(stock_rank['Ticker'].unique())
-stock_rank['PriceHistory'] = stock_rank['Ticker'].map(price_history)
+
+
 
 one, two, three, four = st.columns(4)
 
@@ -63,6 +62,8 @@ for i, signal in enumerate(signals):
 
     df_stock_rank = stock_rank[stock_rank["Signal"] == signal]
     df_stock_rank = df_stock_rank.sort_values(by=['RankGroup','Rank'])
+    price_history = query_prices(df_stock_rank['Ticker'].unique())
+    df_stock_rank['PriceHistory'] = df_stock_rank['Ticker'].map(price_history)
     df_stock_rank = df_stock_rank[['Ticker','RankGroup','Rank','PriceHistory']]
 
     df_stock_rank_highest = df_stock_rank[df_stock_rank["RankGroup"]=="Highest"]
