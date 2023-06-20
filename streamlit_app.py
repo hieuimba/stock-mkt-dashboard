@@ -50,19 +50,23 @@ mkt_rank = query("select * from visual.MktRanking")
 
 signals = mkt_his['Signal'].unique()
 
+stock_his = mkt_his[mkt_his["SecType"] == "Stock"]
+
+stock_rank = mkt_rank[mkt_rank["SecType"] == "Stock"]
+price_history = query_prices(stock_rank['Ticker'].unique())
+stock_rank['PriceHistory'] = stock_rank['Ticker'].map(price_history)
+
 one, two, three, four = st.columns(4)
 
 for i, signal in enumerate(signals):
-    df_mkt_his = mkt_his[(mkt_his["Signal"] == signal) & (mkt_his["SecType"] == "Stock")]
+    df_stock_his = stock_his[mkt_his["Signal"] == signal]
 
-    df_mkt_rank = mkt_rank[(mkt_rank["Signal"] == signal) & (mkt_rank["SecType"] == "Stock")]
-    df_mkt_rank = df_mkt_rank.sort_values(by=['RankGroup','Rank'])
-    df_mkt_rank = df_mkt_rank[['Ticker','RankGroup','Rank']]
-    price_history = query_prices(df_mkt_rank['Ticker'].unique())
-    df_mkt_rank['PriceHistory'] = df_mkt_rank['Ticker'].map(price_history)
+    df_stock_rank = stock_rank[stock_rank["Signal"] == signal]
+    df_stock_rank = df_stock_rank.sort_values(by=['RankGroup','Rank'])
+    df_stock_rank = df_stock_rank[['Ticker','RankGroup','Rank','PriceHistory']]
 
-    df_mkt_rank_highest = df_mkt_rank[df_mkt_rank["RankGroup"]=="Highest"]
-    df_mkt_rank_lowest = df_mkt_rank[df_mkt_rank["RankGroup"]=="Lowest"]
+    df_stock_rank_highest = df_stock_rank[df_stock_rank["RankGroup"]=="Highest"]
+    df_stock_rank_lowest = df_stock_rank[df_stock_rank["RankGroup"]=="Lowest"]
 
     if i == 0:
         column = one
@@ -87,13 +91,13 @@ for i, signal in enumerate(signals):
 
     with column:
         st.subheader(f"{header}")
-        histogram = px.bar(df_mkt_his, x ='Bin', y='BinCount', category_orders=category_order, color="Bin", color_discrete_sequence=color_seq,height =400)
+        histogram = px.bar(df_stock_his, x ='Bin', y='BinCount', category_orders=category_order, color="Bin", color_discrete_sequence=color_seq,height =400)
         st.plotly_chart(histogram,use_container_width=True)
     
         tab_one, tab_two = st.tabs(["Highest","Lowest"])
         with tab_one:
-            st.data_editor(df_mkt_rank_highest, column_config={"PriceHistory":st.column_config.LineChartColumn("Price (last 21 days)")}, hide_index=True, use_container_width=True)
+            st.data_editor(df_stock_rank_highest, column_config={"PriceHistory":st.column_config.LineChartColumn("Price (last 21 days)")}, hide_index=True, use_container_width=True)
         with tab_two:
-            st.data_editor(df_mkt_rank_lowest, column_config={"PriceHistory":st.column_config.LineChartColumn("Price (last 21 days)")}, hide_index=True, use_container_width=True)
+            st.data_editor(df_stock_rank_lowest, column_config={"PriceHistory":st.column_config.LineChartColumn("Price (last 21 days)")}, hide_index=True, use_container_width=True)
 
 
