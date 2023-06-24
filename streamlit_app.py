@@ -8,17 +8,13 @@ st.set_page_config(layout="wide")
 # Define the URL and payload for the POST request
 url = st.secrets["DB_URL"]
 
-@st.cache_data
+@st.cache_data(ttl = 3600)
 def query(query):
     request = {"query": query}
     response = json.loads(requests.post(url, json=request).content.decode('utf-8'))
+    return pd.DataFrame(response)
 
-    if query not in st.session_state:
-        st.session_state[query] = response
-
-    return pd.DataFrame(st.session_state[query])
-
-@st.cache_data
+@st.cache_data(ttl = 3600)
 def query_prices(tickers_list):
     tickers_string = ','.join(tickers_list)
     query = f"EXEC GetClosePrices @Tickers = '{tickers_string}'"
@@ -33,11 +29,7 @@ def query_prices(tickers_list):
             ticker_dict[ticker] = []
         
         ticker_dict[ticker].append(close_price)
-
-    if query not in st.session_state:
-        st.session_state[query] = ticker_dict
-
-    return st.session_state[query]
+    return ticker_dict
 
 
 date_timestamp = query("SELECT MAX([DATE]) AS Date FROM raw.prices")["Date"][0]
