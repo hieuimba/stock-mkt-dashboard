@@ -37,6 +37,8 @@ def string_to_array(row):
 #         ticker_dict[ticker].append(close_price)
 #     return ticker_dict
 
+st.sidebar.text("testing!")
+
 
 date_timestamp = query("SELECT MAX([DATE]) AS Date FROM analytics.TodaySnapshot")["Date"][0]
 unique_tickers = query("SELECT COUNT(DISTINCT ticker) AS Count FROM analytics.TodaySnapshot Where SecType = 'Stock'")["Count"][0]
@@ -53,7 +55,6 @@ stock_rank = mkt_rank[mkt_rank["SecType"] == "Stock"]
 
 
 
-one, two, three, four = st.columns(4)
 
 for i, signal in enumerate(signals):
     df_stock_his = stock_his[mkt_his["Signal"] == signal]
@@ -62,46 +63,56 @@ for i, signal in enumerate(signals):
     df_stock_rank = df_stock_rank.sort_values(by=['RankGroup','Rank'])
     df_stock_rank['Prices'] = df_stock_rank['Prices'].apply(string_to_array)
 
-
     df_stock_rank_highest = df_stock_rank[df_stock_rank["RankGroup"]=="Highest"]
     df_stock_rank_lowest = df_stock_rank[df_stock_rank["RankGroup"]=="Lowest"]
-    df_stock_rank_highest = df_stock_rank_highest[['Ticker','Value','Prices','Change','Volume']]
-    df_stock_rank_lowest = df_stock_rank_lowest[['Ticker','Value','Prices','Change','Volume']]
+    df_stock_rank_highest = df_stock_rank_highest[['Ticker','Value','Prices','Last','Change','Volume']]
+    df_stock_rank_lowest = df_stock_rank_lowest[['Ticker','Value','Prices','Last','Change','Volume']]
 
     if i == 0:
-        column = one
-        category_order = {"Bin":["< 0","0 - 12.5","12.5 - 25","25 - 37.5","37.5 - 50","50 - 62.5","62.5 - 75","75 - 87.5","87.5 - 100","> 100"]}
-        color_seq = ["#ef4444"] * 5 + ["#22c55e"] * 5
-        header = "52 Week Range"
-        col_name = "52WkR"
+        category_order = {"Bin":["> 100", "87.5 - 100", "75 - 87.5", "62.5 - 75", "50 - 62.5", "37.5 - 50", "25 - 37.5", "12.5 - 25", "0 - 12.5", "< 0"]}
+        color_seq =  ["#22c55e"] * 5 + ["#ef4444"] * 5 
+        header = "Year Range"
+        col_name = "52 Week Range"
     elif i == 1:
-        column = two
-        category_order = {"Bin":["< 0","0 - 12.5","12.5 - 25","25 - 37.5","37.5 - 50","50 - 62.5","62.5 - 75","75 - 87.5","87.5 - 100","> 100"]}
-        color_seq = ["#ef4444"] * 5 + ["#22c55e"] * 5
-        header = "Keltner Channel Position"
-        col_name = "KCPos"
+        category_order = {"Bin":["> 100", "87.5 - 100", "75 - 87.5", "62.5 - 75", "50 - 62.5", "37.5 - 50", "25 - 37.5", "12.5 - 25", "0 - 12.5", "< 0"]}
+        color_seq = ["#22c55e"] * 5 + ["#ef4444"] * 5 
+        header = "Month Range"
+        col_name = "Kelner Channel Position"
     elif i == 2:
-        column = three
-        category_order = {"Bin":["< -4","-4 - -3","-3 - -2","-2 - -1","-1 - 0","0 - 1","1 - 2","2 - 3","3 - 4","> 4"]}
-        color_seq = ["#ef4444"] * 5 + ["#22c55e"] * 5
-        header = "Sigma Spike"
-        col_name = "SSpike"
+        category_order = {"Bin":["> 4", "3 - 4", "2 - 3", "1 - 2", "0 - 1", "-1 - 0", "-2 - -1", "-3 - -2", "-4 - -3", "< -4"]}
+        color_seq = ["#22c55e"] * 5 +  ["#ef4444"] * 5 
+        header = "Relative Return"
+        col_name = "Sigma Spike"
     elif i == 3:
-        column = four
-        category_order = {"Bin":["0 - 1","1 - 2","2 - 3","3 - 4","4 - 5","> 5"]}
+        category_order = {"Bin":["> 5", "4 - 5", "3 - 4", "2 - 3", "1 - 2", "0 - 1"]}
         color_seq = ["#0ea5e9"]
         header = "Relative Volume"
-        col_name = "RVol"
+        col_name = "Relative Volume"
 
-    with column:
-        st.subheader(f"{header}")
-        histogram = px.bar(df_stock_his, x ='Bin', y='BinCount', category_orders=category_order, color="Bin", color_discrete_sequence=color_seq,height =400)
-        st.plotly_chart(histogram,use_container_width=True)
+    st.divider()
     
+    one, two = st.columns([1,2])
+
+
+    with one:
+        st.subheader(f"{header}")
+        histogram = px.bar(df_stock_his, 
+                           y ='Bin', 
+                           x='BinCount', 
+                           category_orders=category_order, 
+                           color="Bin", 
+                           color_discrete_sequence=color_seq,
+                           height =400,
+                           labels={'Bin':'Distribution', 'BinCount':'Count'}
+                           )
+        st.plotly_chart(histogram,use_container_width=True)
+
+    with two:
         tab_one, tab_two = st.tabs(["Highest","Lowest"])
         with tab_one:
             df_stock_rank_highest = df_stock_rank_highest.rename(columns = {'Value':col_name})
             st.data_editor(df_stock_rank_highest, 
+                           height = 388,
                            column_config=
                            {"Prices":st.column_config.LineChartColumn("Price",width="small"),
                             "Change":st.column_config.NumberColumn("Change",format="%.2f %%")
@@ -111,6 +122,7 @@ for i, signal in enumerate(signals):
         with tab_two:
             df_stock_rank_lowest = df_stock_rank_lowest.rename(columns = {'Value':col_name})
             st.data_editor(df_stock_rank_lowest, 
+                           height = 400,
                            column_config=
                            {"Prices":st.column_config.LineChartColumn("Price",width="small"),
                             "Change":st.column_config.NumberColumn("Change",format="%.2f %%")
