@@ -3,3 +3,4 @@ requests
 pandas
 plotly
 numpy
+st-pages
