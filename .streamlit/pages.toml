@@ -1,0 +1,8 @@
+
+[[pages]]
+path = "pages/broad_mkt.py"
+name = "Broad Market"
+
+[[pages]]
+path = "streamlit_app.py"
+name = "Stocks"
