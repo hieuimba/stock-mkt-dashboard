@@ -63,8 +63,6 @@ for i, ticker in enumerate(tickers):
             )
         st.plotly_chart(candlestick_chart, use_container_width=True)
 
-st.divider()
-
 st.subheader('One-Day Returns')
 market_sum_query = "SELECT S.Ticker, S.SecType, SigmaSpike, Name FROM analytics.TodaySnapShot S\
      Left Join raw.Tickers T on T.Ticker=S.Ticker\
