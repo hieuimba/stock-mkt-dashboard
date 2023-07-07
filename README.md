@@ -16,6 +16,6 @@ Making this app was fun, here are a couple things that I learned:
 
 **Logic App:**
 - Logic App is great for building an API but is more expensive than Azure Fuctions. I find it’s generally worth it if you want the flow control operators and/or the built-in connectors for Azure services.
-- In this app, the pre-built Azure AD authentication provided by the Logic App is perfect for connecting to SQL server, which saves me the hassle of manually setting up a connection otherwise.
+- In this app, the pre-built Azure AD authentication provided by Logic App is perfect for connecting to SQL server, which saves me the hassle of manually setting up a connection otherwise.
 
  ![Untitled2](https://github.com/hieuimba/stock-mkt-dashboard/assets/89481020/b66190a2-8d61-4b87-816f-4d5d8bf7100e)
