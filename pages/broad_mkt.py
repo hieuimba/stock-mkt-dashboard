@@ -1,40 +1,27 @@
 import streamlit as st
-import json
 import pandas as pd
-import requests
 import numpy as np
 import plotly.graph_objects as go
+import config
+
 from st_pages import show_pages_from_config
 
 st.set_page_config(layout="wide")
 
 
 show_pages_from_config()
-# Define the URL and payload for the POST request
-url =  st.secrets["DB_URL"]
-
-@st.cache_data(ttl = 3600)
-def query(query):
-    request = {"query": query}
-    response = json.loads(requests.post(url, json=request).content.decode('utf-8'))
-    return pd.DataFrame(response)
 
 
+index_prices_query = config.index_prices_query
 
-
-index_prices_query = "select  P.Ticker, T.Name,[Date], [Open], [High], [Low], [Close], Volume \
-    from raw.Prices P Left Join raw.Tickers T on P.Ticker = T.Ticker \
-        where T.SecType = 'Index'\
-            AND [Date] >= DATEADD(month, -2, GETDATE())"
-
-index_prices = query(index_prices_query)
+index_prices = config.query(index_prices_query)
 tickers= ['^GSPC', '^IXIC', '^RUT', '^GSPTSE', '^VIX','^DXY','^FVX','^TYX'] ## exclude '^TNX'
 
 # Calculate the number of tickers per column
 tickers_per_column = int(np.ceil(len(tickers) / 2))
 
 
-st.subheader('Index Performance')
+st.subheader('Broad Market Performance')
 columns = st.columns(4)
 
 # Iterate over tickers and display DataFrame for each ticker in a separate column
@@ -64,10 +51,7 @@ for i, ticker in enumerate(tickers):
         st.plotly_chart(candlestick_chart, use_container_width=True)
 
 st.subheader('One-Day Returns')
-market_sum_query = "SELECT S.Ticker, S.SecType, S.SigmaSpike, T.ShortName FROM analytics.TodaySnapShot S \
-    Left Join config.TickerShortNames T on T.Ticker=S.Ticker\
-        WHERE S.SecType = 'ETF'"
-market_sum = query(market_sum_query)
+market_sum = config.query(config.market_summary_query)
 # add conditional color
 market_sum["Color"] = np.where(market_sum["SigmaSpike"]<0, '#ef4444', '#22c55e')
 
@@ -91,7 +75,7 @@ bar_chart.add_vline(x=2.5, line_width=1, line_dash="dash", line_color="grey")
 bar_chart.add_vline(x=13.5, line_width=1, line_dash="dash", line_color="grey")
 
 # make space for explanation / annotation
-bar_chart.update_layout(margin=dict(t=50))
+bar_chart.update_layout(margin=dict(t=50), bargap = 0.5)
 
 
 # add annotation
@@ -128,5 +112,5 @@ st.plotly_chart(bar_chart, use_container_width=True)
 
 
 
-date_timestamp = query("SELECT MAX([DATE]) AS Date FROM analytics.TodaySnapshot")["Date"][0]
+date_timestamp = config.query(config.timestamp_query)["Date"][0]
 st.caption(f"Looking at major US indexes and ETFs. Data as of {date_timestamp}")
