@@ -28,7 +28,7 @@ index_prices_query = "select  P.Ticker, T.Name,[Date], [Open], [High], [Low], [C
             AND [Date] >= DATEADD(month, -2, GETDATE())"
 
 index_prices = query(index_prices_query)
-tickers= ['^GSPC', '^RUT', '^IXIC', '^GSPTSE', '^VIX','^DXY','^FVX','^TYX'] ## exclude '^TNX'
+tickers= ['^GSPC', '^IXIC', '^RUT', '^GSPTSE', '^VIX','^DXY','^FVX','^TYX'] ## exclude '^TNX'
 
 # Calculate the number of tickers per column
 tickers_per_column = int(np.ceil(len(tickers) / 2))
@@ -64,24 +64,25 @@ for i, ticker in enumerate(tickers):
         st.plotly_chart(candlestick_chart, use_container_width=True)
 
 st.subheader('One-Day Returns')
-market_sum_query = "SELECT S.Ticker, S.SecType, SigmaSpike, Name FROM analytics.TodaySnapShot S\
-     Left Join raw.Tickers T on T.Ticker=S.Ticker\
-          WHERE S.SecType = 'ETF'"
+market_sum_query = "SELECT S.Ticker, S.SecType, S.SigmaSpike, T.ShortName FROM analytics.TodaySnapShot S \
+    Left Join config.TickerShortNames T on T.Ticker=S.Ticker\
+        WHERE S.SecType = 'ETF'"
 market_sum = query(market_sum_query)
 # add conditional color
 market_sum["Color"] = np.where(market_sum["SigmaSpike"]<0, '#ef4444', '#22c55e')
 
 market_etf = ['SPY','QQQ','IWM']
-sector_etf = ['XLC','XLY','XLP','XLE','XLF','XLV','XLI','XLB','XLRE','XLK','XLU']
-country_etf = ['GXC','EWZ','EWJ','EWU','EWC','PIN','VNM']
+sector_etf = sorted(['XLC','XLY','XLP','XLE','XLF','XLV','XLI','XLB','XLRE','XLK','XLU'])
+country_etf = sorted(['GXC','EWZ','EWJ','EWU','EWC','PIN','VNM'])
 
 etf_order = market_etf + sector_etf + country_etf
 
 market_sum['Ticker'] = pd.Categorical(market_sum['Ticker'], categories=etf_order, ordered=True)
 market_sum = market_sum.sort_values('Ticker')
+market_sum['Name'] = market_sum['ShortName'] + ' (' + market_sum['Ticker'].astype(str) + ')'
 
 bar_chart = go.Figure(data=[go.Bar(
-                            x = market_sum['Ticker'],
+                            x = market_sum['ShortName'],
                             y = market_sum['SigmaSpike'],
                             marker_color = market_sum['Color']
                             )])

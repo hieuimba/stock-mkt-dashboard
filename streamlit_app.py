@@ -53,24 +53,11 @@ for i, signal in enumerate(signals):
         header = "Year Range"
         col_name = "52 Week Range"
 
-        metric_1_name = 'New Highs'
-        metric_1_value = df_stock_his.loc[df_stock_his['Bin'] == '> 100', 'BinCount'].values[0]
-        metric_1_value_formatted = f'{metric_1_value} ({round(metric_1_value/value_count*100,1)} %)'
-        metric_2_name = 'New Lows'
-        metric_2_value = df_stock_his.loc[df_stock_his['Bin'] == '< 0', 'BinCount'].values[0]
-        metric_2_value_formatted = f'{metric_2_value} ({round(metric_2_value/value_count*100,1)} %)'
     elif i == 1:
         category_order = {"Bin":["> 100", "87.5 - 100", "75 - 87.5", "62.5 - 75", "50 - 62.5", "37.5 - 50", "25 - 37.5", "12.5 - 25", "0 - 12.5", "< 0"]}
         color_seq = ["#22c55e"] * 5 + ["#ef4444"] * 5 
         header = "Month Range"
         col_name = "KC Position"
-
-        metric_1_name = 'Strong Bullish Move'
-        metric_1_value = df_stock_his.loc[df_stock_his['Bin'] == '> 100', 'BinCount'].values[0]
-        metric_1_value_formatted = f'{metric_1_value} ({round(metric_1_value/value_count*100,1)} %)'
-        metric_2_name = 'Strong Bearish Move'
-        metric_2_value = df_stock_his.loc[df_stock_his['Bin'] == '< 0', 'BinCount'].values[0]
-        metric_2_value_formatted = f'{metric_2_value} ({round(metric_2_value/value_count*100,1)} %)'
 
     elif i == 2:
         category_order = {"Bin":["> 4", "3 - 4", "2 - 3", "1 - 2", "0 - 1", "-1 - 0", "-2 - -1", "-3 - -2", "-4 - -3", "< -4"]}
@@ -78,21 +65,12 @@ for i, signal in enumerate(signals):
         header = "Relative Return"
         col_name = "Sigma Spike"
 
-        metric_1_name = 'Strong Bullish SS'
-        metric_1_value = df_stock_his.loc[df_stock_his['Bin'] == '> 4', 'BinCount'].values[0]
-        metric_1_value_formatted = f'{metric_1_value} ({round(metric_1_value/value_count*100,1)} %)'
-        metric_2_name = 'Strong Bearish SS'
-        metric_2_value = df_stock_his.loc[df_stock_his['Bin'] == '< -4', 'BinCount'].values[0]
-        metric_2_value_formatted = f'{metric_2_value} ({round(metric_2_value/value_count*100,1)} %)'
     elif i == 3:
         category_order = {"Bin":["> 5", "4 - 5", "3 - 4", "2 - 3", "1 - 2", "0 - 1"]}
         color_seq = ["#0ea5e9"]
         header = "Relative Volume"
         col_name = "Relative Volume"
 
-        metric_1_name = 'Strong Volume'
-        metric_1_value = df_stock_his.loc[df_stock_his['Bin'] == '> 5', 'BinCount'].values[0]
-        metric_1_value_formatted = f'{metric_1_value} ({round(metric_1_value/value_count*100,1)} %)'
 
     
     one, two = st.columns([1,2])
