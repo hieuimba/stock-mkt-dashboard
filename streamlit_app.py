@@ -30,25 +30,25 @@ for i, signal in enumerate(signals):
     value_count = df_stock_his["BinCount"].sum()
     if i == 0:
         category_order = {"Bin":config.yr_range_bins_sorted}
-        color_seq =  ["#22c55e"] * 5 + ["#ef4444"] * 5 
+        color_seq =  [config.green] * 5 + [config.red] * 5 
         header = "Year Range Distibution"
         col_name = "52 Week Range"
 
     elif i == 1:
         category_order = {"Bin":config.yr_range_bins_sorted}
-        color_seq = ["#22c55e"] * 5 + ["#ef4444"] * 5 
+        color_seq = [config.green] * 5 + [config.red] * 5 
         header = "Month Range Distribution"
         col_name = "KC Position"
 
     elif i == 2:
         category_order = {"Bin":config.sigma_spike_bins_sorted}
-        color_seq = ["#22c55e"] * 5 +  ["#ef4444"] * 5 
+        color_seq = [config.green] * 5 + [config.red] * 5 
         header = "Relative Return Distribution"
         col_name = "Sigma Spike"
 
     elif i == 3:
         category_order = {"Bin":config.rvol_bins_sorted}
-        color_seq = ["#0ea5e9"]
+        color_seq = [config.blue]
         header = "Relative Volume Distribution"
         col_name = "Relative Volume"
 
@@ -77,7 +77,6 @@ for i, signal in enumerate(signals):
         tab_one, tab_two = st.tabs(["Highest","Lowest"])
         with tab_one:
             st.data_editor(df_stock_rank_highest, 
-                           height = 388,
                            column_config=
                            {"Prices":st.column_config.LineChartColumn("21 Day Chart",width="small"),
                             "Change":st.column_config.NumberColumn("Change",format="%.2f %%")
@@ -87,7 +86,6 @@ for i, signal in enumerate(signals):
                            use_container_width=True)
         with tab_two:
             st.data_editor(df_stock_rank_lowest, 
-                           height = 400,
                            column_config=
                            {"Prices":st.column_config.LineChartColumn("21 Day Chart",width="small"),
                             "Change":st.column_config.NumberColumn("Change",format="%.2f %%")

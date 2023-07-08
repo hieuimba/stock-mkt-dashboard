@@ -4,5 +4,10 @@ path = "pages/broad_mkt.py"
 name = "Broad Market"
 
 [[pages]]
+path = "pages/sector.py"
+name = "Sector Analysis"
+
+[[pages]]
 path = "streamlit_app.py"
-name = "Stocks"
+name = "Stock Analysis"
+
