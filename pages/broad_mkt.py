@@ -6,15 +6,15 @@ import config
 from st_pages import show_pages_from_config
 
 st.set_page_config(layout="wide")
-
 show_pages_from_config()
-
-
-keep_indexes= ['^GSPC', '^IXIC', '^RUT', '^GSPTSE', '^VIX','^DXY','^FVX','^TYX'] ## exclude '^TNX'
+st.markdown(config.condensed_page_style, unsafe_allow_html=True)
 
 
 st.subheader('Broad Market Performance')
 charts, index_summary, one_day_returns = st.tabs(["Index Charts","Index Summary","One-Day Returns"])
+
+keep_indexes= ['^GSPC', '^IXIC', '^RUT', '^GSPTSE', '^VIX','^DXY','^FVX','^TYX'] ## exclude '^TNX'
+
 with charts:
     index_prices_query = config.index_prices_query
     index_prices = config.query(index_prices_query)
@@ -42,8 +42,8 @@ with charts:
                                                     decreasing_fillcolor = config.red
                                                     )])
             candlestick_chart.update_layout(
-                margin=dict(t=30, b=30),
-                height = 330,
+                margin=dict(t=30,b=30,r=30),
+                height = 300,
                 title = index_name,
                 xaxis_rangeslider_visible=False)
             candlestick_chart.update_xaxes(
@@ -56,10 +56,10 @@ with index_summary:
 
 
     index_summary_table = index_summary_table.rename(
-        columns={old_col: new_col for old_col, new_col in zip(config.index_table_rename_source, config.index_table_rename_target)}
+        columns={old_col: new_col for old_col, new_col in zip(config.sum_table_rename_source, config.sum_table_rename_target)}
     )
-    st.dataframe(index_summary_table.style.format({col: '{:.2%}' if col != 'Sigma Spike' else '{:.2}'for col in config.index_table_percentage_format_subset})
-                 .applymap(config.format_positive_negative_cell_color, subset=config.index_table_color_format_subset), 
+    st.dataframe(index_summary_table.style.format({col: '{:.2%}' if col != 'Sigma Spike' else '{:.2}'for col in config.sum_table_percentage_format_subset})
+                 .applymap(config.format_positive_negative_cell_color, subset=config.sum_table_color_format_subset), 
                 hide_index=True,
                 use_container_width=True)
 
