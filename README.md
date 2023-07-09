@@ -2,7 +2,7 @@ My Data Engineering Project
 
 https://stock-mkt-dashboard.streamlit.app/
 
-Making this app was fun, here are a couple things that I learned:
+Making this app was fun, here are a couple things that I learned on the back-end side:
 
 **Azure Functions:**
 - Azure Functions provide a built-in HTTP endpoint trigger that can be integrated easily with DataFactory’s HTTP dataset connector. I’ve found this to be a very simple and effective method to connect to any custom source using Python.
