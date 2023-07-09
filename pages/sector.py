@@ -71,7 +71,7 @@ with etf_summary:
 with etf_correlation:
     one_month, one_year = st.columns(2)
     with one_month:
-        etf_return = config.query(config.etf_return_query_one_month)
+        etf_return = config.query(config.etf_return_query_one_month_query)
         etf_return['Name'] = etf_return['Name'].str.split('Select').str[0].str.strip()
 
         correlation_matrix_data = etf_return.pivot(columns='Name', values='Return', index='Order').corr().round(2)
@@ -89,7 +89,7 @@ with etf_correlation:
         
         st.plotly_chart(correlation_matrix_plot,use_container_width=True)
     with one_year:
-        etf_return = config.query(config.etf_return_query_one_year)
+        etf_return = config.query(config.etf_return_query_one_year_query)
         etf_return['Name'] = etf_return['Name'].str.split('Select').str[0].str.strip()
 
         correlation_matrix_data = etf_return.pivot(columns='Name', values='Return', index='Order').corr().round(2)

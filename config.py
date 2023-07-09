@@ -78,12 +78,18 @@ etf_table_query = "select T.Name, S.Ticker, S.[Return] as 'OneDayReturn', R.OneW
     left join analytics.AggReturns R on R.Ticker  = S.Ticker\
         where S.SecType = 'ETF' AND S.Ticker LIKE 'XL%'\
             Order by S.Ticker"
-etf_return_query_one_month = "select T.ShortName as 'Name', [Date], [Return], [Order] from raw.Prices P\
+etf_return_query_one_month_query = "select T.ShortName as 'Name', [Date], [Return], [Order] from raw.Prices P\
     left join config.TickerShortNames T on T.Ticker = P.Ticker\
         where T.SecType = 'ETF' AND P.Ticker LIKE 'XL%' AND [RETURN] is not null AND [Order] <=20"
-etf_return_query_one_year = "select T.ShortName as 'Name', [Date], [Return], [Order] from raw.Prices P\
+etf_return_query_one_year_query = "select T.ShortName as 'Name', [Date], [Return], [Order] from raw.Prices P\
     left join config.TickerShortNames T on T.Ticker = P.Ticker\
         where T.SecType = 'ETF' AND P.Ticker LIKE 'XL%' AND [RETURN] is not null"
+
+stock_heatmap_query = "select TOP 1000 S.Ticker,S.SecType,S.[Return], COALESCE(S.SigmaSpike, 0) as SigmaSpike, T.Sector, T.Industry, T.MarketCap\
+    from analytics.TodaySnapshot S\
+    left join raw.Tickers T on T.Ticker = S.Ticker \
+    where S.SecType = 'Stock'\
+    order by MarketCap desc"
 
 # summary table settings
 sum_table_rename_source = ['OneDayReturn', 'OneWeekReturn','OneMonthReturn','OneQuarterReturn','OneYearReturn', 'SigmaSpike','MonthRange','YearRange']

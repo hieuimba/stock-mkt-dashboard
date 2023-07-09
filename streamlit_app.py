@@ -15,7 +15,7 @@ stock_rank = mkt_rank[mkt_rank["SecType"] == "Stock"]
 
 st.subheader('Stock Performance')
 
-year_range, month_range, sigma_spike, rvol = st.tabs(['Year Range Dist', 'Month Range Dist', 'Relative Return Dist', 'Relative Volume Dist'])
+heatmap, year_range, month_range, sigma_spike, rvol = st.tabs(['Heat Map','Year Range', 'Month Range', 'Relative Return', 'Relative Volume'])
 
 for i, signal in enumerate(signals):
     df_stock_his = stock_his[mkt_his["Signal"] == signal]
@@ -78,6 +78,8 @@ for i, signal in enumerate(signals):
             histogram.update_layout(
                 margin=dict(t=30),
                 showlegend=False)
+            st.write('')
+            st.write('')
             st.plotly_chart(histogram,use_container_width=True)
         with two:
             df_stock_rank_highest = df_stock_rank_highest.rename(columns = {'Value':col_name})
@@ -102,6 +104,29 @@ for i, signal in enumerate(signals):
                             hide_index=True, 
                             disabled= True,
                             use_container_width=True)
+
+with heatmap:
+    heatmap_data = config.query(config.stock_heatmap_query)
+    heatmap_data['Return'] = heatmap_data['Return']*100
+    heatmap_data = heatmap_data.sort_values(by='Ticker')
+
+    heatmap_plot = px.treemap(heatmap_data, path=[px.Constant("Stock Heatmap (Relative Return)"), 'Sector', 'Industry', 'Ticker'], values='MarketCap',
+                    color='SigmaSpike', 
+                    color_continuous_scale=[config.red]*5+ [config.darkgrey] + [config.green]*5,
+                    color_continuous_midpoint=0)
+    heatmap_plot.update_layout(
+                        margin=dict(t=0, b=0, r=0),
+                        height = 650,
+                        font_size = 15)
+
+    heatmap_plot.update_coloraxes(showscale=False)
+    heatmap_plot.data[0].customdata = heatmap_data[['Ticker','SigmaSpike','Return']].round(2) # round to 3 decimal places
+    heatmap_plot.data[0].texttemplate = "%{label}<br>%{customdata[1]}"
+    heatmap_plot.update_traces(textposition="middle center",
+                               marker=dict(cornerradius=3),
+                               hovertemplate ='<b>%{label} </b> <br> Sigma Spike: %{color:.2f} <br> Return: %{customdata[2]:.2f}%',
+                               )
+    st.plotly_chart(heatmap_plot,use_container_width=True)
 
 
 date_timestamp = config.query(config.timestamp_query)["Date"][0]
