@@ -62,6 +62,7 @@ with etf_summary:
         columns={old_col: new_col for old_col, new_col in zip(config.sum_table_rename_source, config.sum_table_rename_target)}
     )
     etf_summary_table['Name'] = etf_summary_table['Name'].str.split('Select').str[0].str.strip()
+    etf_summary_table.loc[etf_summary_table['Name'] == 'The Real Estate', 'Name'] = 'Real Estate'
     st.dataframe(etf_summary_table.style.format({col: '{:.2%}' if col != 'Sigma Spike' else '{:.2}'for col in config.sum_table_percentage_format_subset})
                  .applymap(config.format_positive_negative_cell_color, subset=config.sum_table_color_format_subset), 
                 hide_index=True,
