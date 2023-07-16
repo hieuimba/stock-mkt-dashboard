@@ -39,7 +39,7 @@ Making this app was my first time using Azure for a personal project, here are a
 - Azure Functions provide a built-in HTTP endpoint trigger that can be integrated easily with DataFactory’s HTTP dataset connector. I’ve found this to be a very simple and effective method to connect to any custom source using Python.
 
 **Data Factory:**
-- When factoring in the cost of computing activities, DataFactory is probably best used as an ingestion and/or orchestration tool. Avoid dataflows as they are not very cost-effective and you can pretty much do the same things in SQL easier and especially cheaper.
+- When factoring in the cost of computing activities, DataFactory is probably best used as an ingestion and/or orchestration tool. Avoid dataflows as they are not very cost-effective and you can pretty much do the same things in SQL for a fraction of the price.
 - If possible, limit the number of activities since your execution time is billed for at least one minute per activity, rounded up to the next minute. This means that if your activity runs for only 5 seconds you are still charged for a full minute. These add up really quickly especially if you are running looped activities.
 - Extra tip for copy activities: Change the maximum DIUs (Data Integration Unit) to 2 and increase as required. The default setting is Auto, which starts at 4 but scales automatically. By doing this you can save 50% of your cost! Of course, this affects performance but for smaller datasets it's definitely worth it.
 
