@@ -1,5 +1,5 @@
 # Stock Market Dashboard
-Data Engineering Project
+Data Engineering Project with Azure stack
 
 https://stock-mkt-dashboard.streamlit.app/
 
