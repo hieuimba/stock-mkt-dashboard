@@ -49,7 +49,7 @@ rvol_bins_sorted = ["> 5", "4 - 5", "3 - 4", "2 - 3", "1 - 2", "0 - 1"]
 timestamp_query = "SELECT MAX([DATE]) AS Date FROM analytics.TodaySnapshot"
 unique_tickers_query = "SELECT COUNT(DISTINCT ticker) AS Count FROM analytics.TodaySnapshot Where SecType = 'Stock'"
 
-index_prices_query = "select  P.Ticker, T.Name,[Date], [Open], [High], [Low], [Close], Volume \
+index_prices_query = "select  P.Ticker, T.Name,[Date], [Open], [High], [Low], [Close],[Return], Volume \
     from raw.Prices P Left Join raw.Tickers T on P.Ticker = T.Ticker \
         where T.SecType = 'Index'\
             AND [Date] >= DATEADD(month, -2, GETDATE())"
@@ -64,7 +64,7 @@ one_day_return_query = "SELECT S.Ticker, S.SecType, S.SigmaSpike, T.ShortName FR
     Left Join config.TickerShortNames T on T.Ticker=S.Ticker\
         WHERE S.SecType = 'ETF'"
 
-etf_prices_query = "select  P.Ticker, T.ShortName as 'Name',[Date], [Open], [High], [Low], [Close], Volume \
+etf_prices_query = "select  P.Ticker, T.ShortName as 'Name',[Date], [Open], [High], [Low], [Close],[Return], Volume \
     from raw.Prices P Left Join config.TickerShortNames T on P.Ticker = T.Ticker \
         where T.SecType = 'ETF'\
             AND [Date] >= DATEADD(month, -2, GETDATE())\

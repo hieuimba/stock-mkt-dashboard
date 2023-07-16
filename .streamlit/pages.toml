@@ -11,3 +11,7 @@ name = "Sector Analysis"
 path = "streamlit_app.py"
 name = "Stock Analysis"
 
+
+[[pages]]
+path = "pages/glossary.py"
+name =  "Glossary"

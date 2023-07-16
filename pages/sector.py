@@ -25,7 +25,13 @@ def create_etf_chart(df):
             if ticker_index < num_tickers:
                 ticker = tickers[ticker_index]
                 with cols[j]:
-                    etf_df = df[df['Ticker'] == ticker]
+                    etf_df = df[df['Ticker'] == ticker].copy()
+
+                    etf_df['Return'] = (etf_df['Return']*100).round(2)
+                    return_value =  etf_df['Return'].iloc[-1]
+                    return_str = f"+{return_value}%" if return_value >= 0 else f"{return_value}%"
+                    return_color = config.red if return_value <0 else config.green
+
                     title = f"{etf_df['Name'].iloc[0]} ({etf_df['Ticker'].iloc[0]})"
                     
                     candlestick_chart = go.Figure(data=[go.Candlestick(
@@ -47,11 +53,22 @@ def create_etf_chart(df):
                     candlestick_chart.update_xaxes(
                         rangebreaks=[dict(bounds=["sat", "mon"])]
                         )
+                    # Add return_str as text in the top right corner
+                    candlestick_chart.add_annotation(
+                        x=1,
+                        y=1.13,
+                        text=return_str,
+                        font=dict(color=return_color, size=15),
+                        showarrow=False,
+                        align='right',
+                        xref='paper',
+                        yref='paper'
+                    )
                     st.plotly_chart(candlestick_chart, use_container_width=True)
 
 st.subheader("Sector Performance")
 
-charts, etf_summary, etf_correlation = st.tabs(["ETF Charts","ETF Summary","ETF Correlations"])
+charts, etf_summary, etf_correlation = st.tabs(["Charts","Summary","Sector Correlations"])
 
 with charts:
     create_etf_chart(etf_prices)
@@ -106,3 +123,7 @@ with etf_correlation:
         correlation_matrix_plot.update_coloraxes(showscale=False)
         
         st.plotly_chart(correlation_matrix_plot,use_container_width=True)
+
+
+date_timestamp = config.query(config.timestamp_query)["Date"][0]
+st.caption(f"Looking at 11 market sector ETFs. EOD Data as of {date_timestamp}")

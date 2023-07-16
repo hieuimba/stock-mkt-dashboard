@@ -11,7 +11,7 @@ st.markdown(config.condensed_page_style, unsafe_allow_html=True)
 
 
 st.subheader('Broad Market Performance')
-charts, index_summary, one_day_returns = st.tabs(["Index Charts","Index Summary","One-Day Returns"])
+charts, index_summary, one_day_returns = st.tabs(["Charts","Summary","One-Day Returns"])
 
 keep_indexes= ['^GSPC', '^IXIC', '^RUT', '^GSPTSE', '^VIX','^DXY','^FVX','^TYX'] ## exclude '^TNX'
 
@@ -30,6 +30,11 @@ with charts:
         with columns[column_index]:
             index = index_prices[index_prices['Ticker'] == ticker]
             index_name = index['Name'].iloc[0]
+
+            return_value = round(index['Return'].iloc[-1]*100, 2)
+            return_str = f"+{return_value}%" if return_value >= 0 else f"{return_value}%"
+            return_color = config.red if return_value <0 else config.green
+
             candlestick_chart = go.Figure(data=[go.Candlestick(
                                                     x=index['Date'],
                                                     open = index['Open'],
@@ -49,7 +54,19 @@ with charts:
             candlestick_chart.update_xaxes(
                 rangebreaks=[dict(bounds=["sat", "mon"])]
                 )
+            # Add return_str as text in the top right corner
+            candlestick_chart.add_annotation(
+                x=1,
+                y=1.13,
+                text=return_str,
+                font=dict(color=return_color, size=15),
+                showarrow=False,
+                align='right',
+                xref='paper',
+                yref='paper'
+            )
             st.plotly_chart(candlestick_chart, use_container_width=True)
+    
 with index_summary:
     index_summary_table = config.query(config.index_table_query)
     index_summary_table = index_summary_table.loc[index_summary_table['Ticker'].isin(keep_indexes)].sort_values(by=['Ticker'], key=lambda x: x.map({v: i for i, v in enumerate(keep_indexes)}))
@@ -130,4 +147,4 @@ with one_day_returns:
 
 
 date_timestamp = config.query(config.timestamp_query)["Date"][0]
-st.caption(f"Looking at major US indexes and ETFs. Data as of {date_timestamp}")
+st.caption(f"Looking at major US indexes and ETFs. EOD data as of {date_timestamp}")

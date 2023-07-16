@@ -15,7 +15,7 @@ stock_rank = mkt_rank[mkt_rank["SecType"] == "Stock"]
 
 st.subheader('Stock Performance')
 
-heatmap, year_range, month_range, sigma_spike, rvol = st.tabs(['Heat Map','Year Range', 'Month Range', 'Relative Return', 'Relative Volume'])
+heatmap, sigma_spike, month_range, year_range, rvol = st.tabs(['Heat Map', 'Sigma Spike', 'Month Range','Year Range', 'Relative Volume'])
 
 for i, signal in enumerate(signals):
     df_stock_his = stock_his[mkt_his["Signal"] == signal]
@@ -31,13 +31,12 @@ for i, signal in enumerate(signals):
     df_stock_rank_lowest = df_stock_rank_lowest[keep_cols]
 
     value_count = df_stock_his["BinCount"].sum()
-    if i == 0:
-        category_order = {"Bin":config.yr_range_bins_sorted}
-        color_seq =  [config.green] * 5 + [config.red] * 5 
-        header = "Year Range Distibution"
-        col_name = "52 Week Range"
-        tab = year_range
-
+    if  i == 2:
+        category_order = {"Bin":config.sigma_spike_bins_sorted}
+        color_seq = [config.green] * 5 + [config.red] * 5 
+        header = "Sigma Spike Distribution"
+        col_name = "Sigma Spike"
+        tab = sigma_spike
     elif i == 1:
         category_order = {"Bin":config.yr_range_bins_sorted}
         color_seq = [config.green] * 5 + [config.red] * 5 
@@ -45,12 +44,13 @@ for i, signal in enumerate(signals):
         col_name = "KC Position"
         tab = month_range
 
-    elif i == 2:
-        category_order = {"Bin":config.sigma_spike_bins_sorted}
-        color_seq = [config.green] * 5 + [config.red] * 5 
-        header = "Relative Return Distribution"
-        col_name = "Sigma Spike"
-        tab = sigma_spike
+    elif i == 0:
+        category_order = {"Bin":config.yr_range_bins_sorted}
+        color_seq =  [config.green] * 5 + [config.red] * 5 
+        header = "Year Range Distibution"
+        col_name = "52 Week Range"
+        tab = year_range
+
 
     elif i == 3:
         category_order = {"Bin":config.rvol_bins_sorted}
@@ -110,7 +110,7 @@ with heatmap:
     heatmap_data['Return'] = heatmap_data['Return']*100
     heatmap_data = heatmap_data.sort_values(by='Ticker')
 
-    heatmap_plot = px.treemap(heatmap_data, path=[px.Constant("Stock Heatmap (Relative Return)"), 'Sector', 'Industry', 'Ticker'], values='MarketCap',
+    heatmap_plot = px.treemap(heatmap_data, path=[px.Constant("Stock Heatmap (Sigma Spike)"), 'Sector', 'Industry', 'Ticker'], values='MarketCap',
                     color='SigmaSpike', 
                     color_continuous_scale=[config.red]*5+ [config.darkgrey] + [config.green]*5,
                     color_continuous_midpoint=0)
@@ -131,4 +131,4 @@ with heatmap:
 
 date_timestamp = config.query(config.timestamp_query)["Date"][0]
 unique_tickers = config.query(config.unique_tickers_query)["Count"][0]
-st.caption(f"Looking at {unique_tickers} active tickers from NASDAQ, AMEX, and NYSE. Data as of {date_timestamp}")
+st.caption(f"Looking at {unique_tickers} active tickers from NASDAQ, AMEX, and NYSE. EOD Data as of {date_timestamp}")
