@@ -11,6 +11,8 @@ This project provides a daily summary of the US Stock Market to assist traders a
 -   Sector correlations
 -   Stock market heatmap
 -   Stock distributions
+  
+![stock-mkt-dashboard](https://github.com/hieuimba/stock-mkt-dashboard/assets/89481020/7a930a4f-18ed-4292-acd0-e33214f6ad17)
 
 ## Architecture
 
@@ -31,7 +33,7 @@ The following technologies are used to build the project:
 -   Streamlit Cloud: for dashboard & visualizations
 
 ## Lessons Learned
-Making this app was fun, here are a few key takeaways from my experience:
+Making this app was my first time using Azure for a personal project, here are a few key takeaways from my experience:
 
 **Azure Functions:**
 - Azure Functions provide a built-in HTTP endpoint trigger that can be integrated easily with DataFactory’s HTTP dataset connector. I’ve found this to be a very simple and effective method to connect to any custom source using Python.
@@ -50,4 +52,4 @@ Making this app was fun, here are a few key takeaways from my experience:
  ![Untitled2](https://github.com/hieuimba/stock-mkt-dashboard/assets/89481020/b66190a2-8d61-4b87-816f-4d5d8bf7100e)
 
 **Data Warehouse**
-- If the final data model is complex, it is useful to break down the transformation processes into manageable steps or layers. Typically the first layer is the raw layer. Subsequent layers perform specific transformations that bring the data closer to its desired output. These layers help in organizing and simplifying the entire process. As an added benefit, this reduces the query time on the front end by shifting the heavy lifting to the database side, typically done only once per day rather than with every query.
+- If the final data model is complex, it is useful to break down the transformation processes into manageable steps or layers. The first layer is the raw layer. Subsequent layers perform specific transformations that bring the data closer to its desired output. These layers help in organizing and simplifying the entire process. As an added benefit, this reduces the query time on the front end by shifting the heavy lifting to the database side, typically done only once per day rather than with every query.
