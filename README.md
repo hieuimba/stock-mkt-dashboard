@@ -1,8 +1,34 @@
-My Data Engineering Project
-
+# Stock Market Dashboard
+Data Engineering Project
 https://stock-mkt-dashboard.streamlit.app/
 
-Making this app was fun, here are a couple things that I learned on the back-end side:
+## Description
+This project aims to provide a daily summary of the US Stock Market in order to assist traders and investors make better trading decisions. Information is aggregated based on end-of-day index, ETF and stock prices in order to visualize:
+
+-   Broad market performance and trend
+-   One-day returns of major indexes and sectors
+-   Sector correlations
+-   Stock market heatmap
+-   Stock distributions
+
+## Architecture
+
+The project’s architecture is an end to end data pipeline which extracts price information from the source APIs (Alpaca Market Data API and Finviz) and load it into a SQL warehouse for processing and transformation. The data is then visualized in Streamlit as an interactive dashboard.
+![process_map](https://github.com/hieuimba/stock-mkt-dashboard/assets/89481020/76d271f9-c3df-4e7b-99ab-a21f74d87187)
+
+## Technology Stack
+
+The following technologies are used to build the project:
+
+-   Azure Functions: for connecting to source data API
+-   Azure Data Factory: for data connectors, scheduling, orchestration
+-   SQL Database: for staging environment & data warehouse
+-   Azure Blob Storage: for miscelaneous & config files
+-   Azure Logic Apps: for front-end API (more efficient than Azure Functions)
+-   Streamlit Cloud: for dashboard & visualizations
+
+## Lessons Learned
+Making this app was fun, here are a few key take-aways from my experience:
 
 **Azure Functions:**
 - Azure Functions provide a built-in HTTP endpoint trigger that can be integrated easily with DataFactory’s HTTP dataset connector. I’ve found this to be a very simple and effective method to connect to any custom source using Python.
