@@ -4,7 +4,7 @@ Data Engineering Project
 https://stock-mkt-dashboard.streamlit.app/
 
 ## Description
-This project aims to provide a daily summary of the US Stock Market in order to assist traders and investors make better trading decisions. Information is aggregated based on end-of-day index, ETF and stock prices in order to visualize:
+This project provides a daily summary of the US Stock Market to assist traders and investors make better trading decisions. Information is aggregated based on end-of-day index, ETF, and stock prices in order to visualize:
 
 -   Broad market performance and trend
 -   One-day returns of major indexes and sectors
@@ -14,7 +14,7 @@ This project aims to provide a daily summary of the US Stock Market in order to 
 
 ## Architecture
 
-The project’s architecture is an end to end data pipeline which extracts price information from the source APIs (Alpaca Market Data API and Finviz) and load it into a SQL warehouse for processing and transformation. The data is then visualized in Streamlit as an interactive dashboard.
+The project’s architecture is an end-to-end data pipeline which extracts price information from the source APIs (Alpaca Market Data API and Finviz) and loads it into a SQL warehouse for processing and transformation. The data is then visualized in Streamlit as an interactive dashboard.
 
 ![data_pipeline](https://github.com/hieuimba/stock-mkt-dashboard/assets/89481020/1e9cc71e-8c24-40b7-9ba2-0d39ac6fac64)
 
@@ -26,12 +26,12 @@ The following technologies are used to build the project:
 -   Azure Functions: for connecting to source data API
 -   Azure Data Factory: for data connectors, scheduling, orchestration
 -   SQL Database: for staging environment & data warehouse
--   Azure Blob Storage: for miscelaneous & config files
+-   Azure Blob Storage: for miscellaneous & config files
 -   Azure Logic Apps: for front-end API (more efficient than Azure Functions)
 -   Streamlit Cloud: for dashboard & visualizations
 
 ## Lessons Learned
-Making this app was fun, here are a few key take-aways from my experience:
+Making this app was fun, here are a few key takeaways from my experience:
 
 **Azure Functions:**
 - Azure Functions provide a built-in HTTP endpoint trigger that can be integrated easily with DataFactory’s HTTP dataset connector. I’ve found this to be a very simple and effective method to connect to any custom source using Python.
@@ -44,7 +44,10 @@ Making this app was fun, here are a few key take-aways from my experience:
 ![Untitled](https://github.com/hieuimba/stock-mkt-dashboard/assets/89481020/8182e21c-b228-4e28-8c1c-8deed4ec822e)
 
 **Logic App:**
-- Logic App is great for building an API but is more expensive than Azure Fuctions. I find it’s generally worth it if you want the flow control operators and/or the built-in connectors for Azure services.
-- In this app, the pre-built Azure AD authentication provided by Logic App is perfect for connecting to SQL server, which saves me the hassle of manually setting up a connection otherwise.
-
+- Logic App is great for building an API but is more expensive than Azure Functions. I find it’s generally worth it if you want the flow control operators and/or the built-in connectors for Azure services.
+- In this app, I used the pre-built Azure AD authentication connector to connect to the SQL warehouse, which eliminates the hassle of manually setting up a connection otherwise.
+  
  ![Untitled2](https://github.com/hieuimba/stock-mkt-dashboard/assets/89481020/b66190a2-8d61-4b87-816f-4d5d8bf7100e)
+
+**Data Warehouse**
+- If the final data model is complex, it is useful to break down the transformation processes into manageable steps or layers. Typically the first layer is the raw layer. Subsequent layers perform specific transformations that bring the data closer to its desired output. These layers help in organizing and simplifying the entire process. As an added benefit, this reduces the query time on the front end by shifting the heavy lifting to the database side, typically done only once per day rather than with every query.
