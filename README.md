@@ -33,7 +33,7 @@ The following technologies are used to build the project:
 -   Streamlit Cloud: for dashboard & visualizations
 
 ## Lessons Learned
-Making this app was fun, here are a few key takeaways from my experience:
+Making this app was my first time using Azure for a personal project, here are a few key takeaways from my experience:
 
 **Azure Functions:**
 - Azure Functions provide a built-in HTTP endpoint trigger that can be integrated easily with DataFactory’s HTTP dataset connector. I’ve found this to be a very simple and effective method to connect to any custom source using Python.
