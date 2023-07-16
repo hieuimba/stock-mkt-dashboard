@@ -11,6 +11,8 @@ This project provides a daily summary of the US Stock Market to assist traders a
 -   Sector correlations
 -   Stock market heatmap
 -   Stock distributions
+  
+![stock-mkt-dashboard](https://github.com/hieuimba/stock-mkt-dashboard/assets/89481020/7a930a4f-18ed-4292-acd0-e33214f6ad17)
 
 ## Architecture
 
