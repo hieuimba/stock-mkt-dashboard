@@ -14,6 +14,7 @@ This project aims to provide a daily summary of the US Stock Market in order to 
 ## Architecture
 
 The project’s architecture is an end to end data pipeline which extracts price information from the source APIs (Alpaca Market Data API and Finviz) and load it into a SQL warehouse for processing and transformation. The data is then visualized in Streamlit as an interactive dashboard.
+
 ![process_map](https://github.com/hieuimba/stock-mkt-dashboard/assets/89481020/76d271f9-c3df-4e7b-99ab-a21f74d87187)
 
 ## Technology Stack
