@@ -11,6 +11,7 @@ st.write("Sigma Spike is an indicator used to identify significant deviations in
          It compares today's return (percentage change in price) to the standard deviation of past returns.")
 st.write("A higher sigma spike indicates a larger and potentially abnormal price movement, while a lower value suggests a more typical change.")
 st.write("Sigma Spike is used when comparing returns between different markets as it accounts for their different volatility levels.")
+st.caption("Sigma Spike was orignally coined by trader Adam Grimes. Learn more about it here: https://adamhgrimes.com/how-to-calculate-sigmaspikes/")
 st.latex(r'''
 \text{{Sigma Spike}} = \frac{{\text{{Today's return}}}}{{\text{{Yesterday's standard deviation (21 periods)}}}}
     ''')
