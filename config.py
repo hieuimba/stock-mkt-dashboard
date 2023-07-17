@@ -2,7 +2,6 @@ import streamlit as st
 import json
 import pandas as pd
 import requests
-import numpy as np
 
 
 # color settings:
@@ -24,7 +23,7 @@ def query(query):
 # Function to convert string to array of floats
 def string_to_array(row):
     values_list = [float(value) for value in row.split(",")]
-    return np.array(values_list)
+    return values_list
 
 
 # Function to apply positive & negative color formatting
