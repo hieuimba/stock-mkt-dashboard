@@ -1,8 +1,10 @@
 import streamlit as st
 import plotly.express as px
 import config
+from st_pages import show_pages_from_config
 
 st.set_page_config(layout="wide")
+show_pages_from_config()
 st.markdown(config.condensed_page_style, unsafe_allow_html=True)
 
 mkt_his = config.query("select * from visual.StockHistogram")

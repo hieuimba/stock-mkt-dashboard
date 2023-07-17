@@ -1,10 +1,10 @@
 
 [[pages]]
-path = "pages/broad_mkt.py"
+path = "st_pages/broad_mkt.py"
 name = "Broad Market"
 
 [[pages]]
-path = "pages/sector.py"
+path = "st_pages/sector.py"
 name = "Sector Analysis"
 
 [[pages]]
@@ -12,5 +12,5 @@ path = "streamlit_app.py"
 name = "Stock Analysis"
 
 [[pages]]
-path = "pages/glossary.py"
+path = "st_pages/glossary.py"
 name =  "Glossary"
