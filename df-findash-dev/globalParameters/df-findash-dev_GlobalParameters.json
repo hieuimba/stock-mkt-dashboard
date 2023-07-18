@@ -1,0 +1,25 @@
+{
+	"Exchange_List": {
+		"type": "array",
+		"value": [
+			"AMEX",
+			"NYSE",
+			"NASDAQ"
+		]
+	},
+	"Row_Chunks": {
+		"type": "array",
+		"value": [
+			0,
+			500,
+			1000,
+			1500,
+			2000,
+			2500,
+			3000,
+			3500,
+			4000,
+			4500
+		]
+	}
+}

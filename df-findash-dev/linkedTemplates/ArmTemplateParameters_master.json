@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "df-findash-dev"
+		},
+		"ls_blob_storage_connectionString": {
+			"value": ""
+		},
+		"ls_sql_server_connectionString": {
+			"value": ""
+		},
+		"ls_funcapp_properties_typeProperties_url": {
+			"value": "https://funcapp-findash-dev.azurewebsites.net/api/"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
