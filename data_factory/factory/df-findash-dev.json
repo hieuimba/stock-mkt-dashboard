@@ -1,0 +1,39 @@
+{
+	"name": "df-findash-dev",
+	"properties": {
+		"globalParameters": {
+			"Exchange_List": {
+				"type": "array",
+				"value": [
+					"AMEX",
+					"NYSE",
+					"NASDAQ"
+				]
+			},
+			"Row_Chunks": {
+				"type": "array",
+				"value": [
+					0,
+					500,
+					1000,
+					1500,
+					2000,
+					2500,
+					3000,
+					3500,
+					4000,
+					4500
+				]
+			}
+		},
+		"globalConfigurations": {
+			"PipelineBillingEnabled": "true"
+		}
+	},
+	"location": "canadacentral",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "fa3d696b-d2af-4953-bba5-762af4eb24f8",
+		"tenantId": "08f8da58-0aa8-4930-bc0f-ce59279820fa"
+	}
+}

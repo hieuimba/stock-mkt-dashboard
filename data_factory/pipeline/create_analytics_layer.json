@@ -1,0 +1,212 @@
+{
+	"name": "create_analytics_layer",
+	"properties": {
+		"activities": [
+			{
+				"name": "TodaySnapShot",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"additionalColumns": [
+							{
+								"name": "Updated",
+								"value": {
+									"value": "@convertTimeZone(utcnow(),'UTC','Central Standard Time')",
+									"type": "Expression"
+								}
+							}
+						],
+						"sqlReaderQuery": "SELECT \n\tp.*,\n\tt.SecType,\n\t(([Close] - [52WkLow]) / ([52WkHigh] - [52WkLow])) * 100 as 'C%52WkRange',\n\t (([Close] - [KCLower]) / ([KCUpper] - [KCLower])) * 100 as 'KCPos'\nFROM \n\t[raw].[prices] p \n\tLEFT JOIN raw.tickers t ON t.ticker = p.ticker \nWHERE p.[Date] = (\n    SELECT MAX([Date])\n    FROM [raw].[Prices]\n    WHERE [Ticker] = p.[Ticker]\n)\n",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "TRUNCATE TABLE analytics.TodaySnapshot",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": 2,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_generic_sql_db",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_generic_sql_table",
+						"type": "DatasetReference",
+						"parameters": {
+							"SchemaName": "analytics",
+							"TableName": "TodaySnapshot"
+						}
+					}
+				]
+			},
+			{
+				"name": "AggPrices",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "TodaySnapShot",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"additionalColumns": [
+							{
+								"name": "Updated",
+								"value": {
+									"value": "@convertTimeZone(utcnow(),'UTC','Central Standard Time')",
+									"type": "Expression"
+								}
+							}
+						],
+						"sqlReaderQuery": "DECLARE @Tickers AS dbo.TickerTable;\nINSERT INTO @Tickers (Ticker, SecType)\nSELECT DISTINCT Ticker, SecType\nFROM analytics.TodaySnapshot;\n\nSELECT a.Ticker, a.SecType, a.Prices as 'OneMonthPrices', b.OneQuarterPrices\nFROM dbo.GetRecentPrices(@Tickers, 21) a\nLEFT JOIN\n(\n    SELECT Ticker, SecType, Prices as 'OneQuarterPrices'\n    FROM dbo.GetRecentPrices(@Tickers, 21*3)\n) b ON a.Ticker = b.Ticker AND a.SecType = b.SecType\n",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "TRUNCATE TABLE analytics.AggPrices",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": 2,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_generic_sql_db",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_generic_sql_table",
+						"type": "DatasetReference",
+						"parameters": {
+							"SchemaName": "analytics",
+							"TableName": "AggPrices"
+						}
+					}
+				]
+			},
+			{
+				"name": "AggReturns",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"additionalColumns": [
+							{
+								"name": "Updated",
+								"value": {
+									"value": "@convertTimeZone(utcnow(),'UTC','Central Standard Time')",
+									"type": "Expression"
+								}
+							}
+						],
+						"sqlReaderQuery": "SELECT P.Ticker,\n\t\tT.SecType,\n       EXP(SUM(LOG((CASE WHEN [Order] <= 3 THEN ([Return]+1) END)))) -1 AS OneWeekReturn,\n\t   EXP(SUM(LOG((CASE WHEN [Order] <= 19 THEN ([Return]+1) END)))) -1 AS OneMonthReturn,\n\t   EXP(SUM(LOG((CASE WHEN [Order] <= 61 THEN ([Return]+1) END)))) -1 AS OneQuarterReturn,\n\t\tEXP(SUM(LOG((CASE WHEN [Order] <= 250 THEN ([Return]+1) END)))) -1 AS OneYearReturn\nFROM raw.Prices P\nLEFT JOIN raw.Tickers T ON T.Ticker = P.Ticker\nGROUP BY P.Ticker, T.SecType;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "TRUNCATE TABLE analytics.AggReturns",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": 2,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_generic_sql_db",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_generic_sql_table",
+						"type": "DatasetReference",
+						"parameters": {
+							"SchemaName": "analytics",
+							"TableName": "AggReturns"
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "Analytics"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-07-18T03:15:39Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

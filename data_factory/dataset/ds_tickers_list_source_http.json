@@ -1,0 +1,27 @@
+{
+	"name": "ds_tickers_list_source_http",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_funcapp",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Exchange": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@concat('func-get-tickers-list/',dataset().Exchange,'?code=Q_g8e-jjMwVLcToQsvr2gccq3Dc8RngzR9CwAPPJffZfAzFu1Qcl2g==')",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
