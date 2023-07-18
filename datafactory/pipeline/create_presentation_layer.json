@@ -1,0 +1,333 @@
+{
+	"name": "create_presentation_layer",
+	"properties": {
+		"activities": [
+			{
+				"name": "StockHistograms",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"additionalColumns": [
+							{
+								"name": "Updated",
+								"value": {
+									"value": "@convertTimeZone(utcnow(),'UTC','Central Standard Time')",
+									"type": "Expression"
+								}
+							}
+						],
+						"sqlReaderQuery": "select B.Signal, B.SecType, B.Bin, COALESCE(sub.BinCount, 0) AS BinCount\nfrom config.HistogramBins B\nLeft join (\nSELECT \n    'SigmaSpike' AS Signal,\n    [SecType],\n    CASE\n        WHEN [SigmaSpike] < -4 THEN '< -4'\n        WHEN [SigmaSpike] >= -4 AND [SigmaSpike] < -3 THEN '-4 - -3'\n        WHEN [SigmaSpike] >= -3 AND [SigmaSpike] < -2 THEN '-3 - -2'\n        WHEN [SigmaSpike] >= -2 AND [SigmaSpike] < -1 THEN '-2 - -1'\n        WHEN [SigmaSpike] >= -1 AND [SigmaSpike] < 0 THEN '-1 - 0'\n        WHEN [SigmaSpike] >= 0 AND [SigmaSpike] < 1 THEN '0 - 1'\n        WHEN [SigmaSpike] >= 1 AND [SigmaSpike] < 2 THEN '1 - 2'\n        WHEN [SigmaSpike] >= 2 AND [SigmaSpike] < 3 THEN '2 - 3'\n        WHEN [SigmaSpike] >= 3 AND [SigmaSpike] < 4 THEN '3 - 4'\n        WHEN [SigmaSpike] >= 4 THEN '> 4'\n    END AS Bin,\n    COUNT(*) AS BinCount\nFROM [analytics].[TodaySnapshot]\nWHERE [SigmaSpike] IS NOT NULL\nand SecType = 'Stock'\nGROUP BY \n    [SecType],\n    CASE\n        WHEN [SigmaSpike] < -4 THEN '< -4'\n        WHEN [SigmaSpike] >= -4 AND [SigmaSpike] < -3 THEN '-4 - -3'\n        WHEN [SigmaSpike] >= -3 AND [SigmaSpike] < -2 THEN '-3 - -2'\n        WHEN [SigmaSpike] >= -2 AND [SigmaSpike] < -1 THEN '-2 - -1'\n        WHEN [SigmaSpike] >= -1 AND [SigmaSpike] < 0 THEN '-1 - 0'\n        WHEN [SigmaSpike] >= 0 AND [SigmaSpike] < 1 THEN '0 - 1'\n        WHEN [SigmaSpike] >= 1 AND [SigmaSpike] < 2 THEN '1 - 2'\n        WHEN [SigmaSpike] >= 2 AND [SigmaSpike] < 3 THEN '2 - 3'\n        WHEN [SigmaSpike] >= 3 AND [SigmaSpike] < 4 THEN '3 - 4'\n        WHEN [SigmaSpike] >= 4 THEN '> 4'\n    END\n) sub\non b.Signal = sub.Signal\nand b.Bin = sub.Bin\nwhere b.Signal = 'SigmaSpike' and b.SecType = 'Stock'\n\nUNION ALL\n\nselect B.Signal, B.SecType, B.Bin, COALESCE(sub.BinCount, 0) AS BinCount\nfrom config.HistogramBins B\nLeft join (\nSELECT \n    'KCPos' AS Signal,\n    [SecType],\n    CASE\n        WHEN [KCPos] < 0 THEN '< 0'\n        WHEN [KCPos] >= 0 AND [KCPos] <= 12.5 THEN '0 - 12.5'\n        WHEN [KCPos] > 12.5 AND [KCPos] <= 25 THEN '12.5 - 25'\n        WHEN [KCPos] > 25 AND [KCPos] <= 37.5 THEN '25 - 37.5'\n        WHEN [KCPos] > 37.5 AND [KCPos] <= 50 THEN '37.5 - 50'\n        WHEN [KCPos] > 50 AND [KCPos] <= 62.5 THEN '50 - 62.5'\n        WHEN [KCPos] > 62.5 AND [KCPos] <= 75 THEN '62.5 - 75'\n        WHEN [KCPos] > 75 AND [KCPos] <= 87.5 THEN '75 - 87.5'\n        WHEN [KCPos] > 87.5 AND [KCPos] <= 100 THEN '87.5 - 100'\n        WHEN [KCPos] > 100 THEN '> 100'\n    END AS Bin,\n    COUNT(*) AS BinCount\nFROM [analytics].[TodaySnapshot]\nWHERE [KCPos] IS NOT NULL\nand SecType = 'Stock'\nGROUP BY \n    [SecType],\n    CASE\n        WHEN [KCPos] < 0 THEN '< 0'\n        WHEN [KCPos] >= 0 AND [KCPos] <= 12.5 THEN '0 - 12.5'\n        WHEN [KCPos] > 12.5 AND [KCPos] <= 25 THEN '12.5 - 25'\n        WHEN [KCPos] > 25 AND [KCPos] <= 37.5 THEN '25 - 37.5'\n        WHEN [KCPos] > 37.5 AND [KCPos] <= 50 THEN '37.5 - 50'\n        WHEN [KCPos] > 50 AND [KCPos] <= 62.5 THEN '50 - 62.5'\n        WHEN [KCPos] > 62.5 AND [KCPos] <= 75 THEN '62.5 - 75'\n        WHEN [KCPos] > 75 AND [KCPos] <= 87.5 THEN '75 - 87.5'\n        WHEN [KCPos] > 87.5 AND [KCPos] <= 100 THEN '87.5 - 100'\n        WHEN [KCPos] > 100 THEN '> 100'\n    END) sub\non b.Signal = sub.Signal\nand b.Bin = sub.Bin\nwhere b.Signal = 'KCPos' and b.SecType = 'Stock'\n\nUNION ALL\n\nselect B.Signal, B.SecType, B.Bin, COALESCE(sub.BinCount, 0) AS BinCount\nfrom config.HistogramBins B\nLeft join (\nSELECT \n    '52WkRange' AS Signal,\n    [SecType],\n    CASE\n        WHEN [C%52WkRange] < 0 THEN '< 0'\n        WHEN [C%52WkRange] >= 0 AND [C%52WkRange] <= 12.5 THEN '0 - 12.5'\n        WHEN [C%52WkRange] > 12.5 AND [C%52WkRange] <= 25 THEN '12.5 - 25'\n        WHEN [C%52WkRange] > 25 AND [C%52WkRange] <= 37.5 THEN '25 - 37.5'\n        WHEN [C%52WkRange] > 37.5 AND [C%52WkRange] <= 50 THEN '37.5 - 50'\n        WHEN [C%52WkRange] > 50 AND [C%52WkRange] <= 62.5 THEN '50 - 62.5'\n        WHEN [C%52WkRange] > 62.5 AND [C%52WkRange] <= 75 THEN '62.5 - 75'\n        WHEN [C%52WkRange] > 75 AND [C%52WkRange] <= 87.5 THEN '75 - 87.5'\n        WHEN [C%52WkRange] > 87.5 AND [C%52WkRange] <= 100 THEN '87.5 - 100'\n        WHEN [C%52WkRange] > 100 THEN '> 100'\n    END AS Bin,\n    COUNT(*) AS BinCount\nFROM [analytics].[TodaySnapshot]\nWHERE [C%52WkRange] IS NOT NULL\nand SecType = 'Stock'\nGROUP BY \n    [SecType],\n    CASE\n        WHEN [C%52WkRange] < 0 THEN '< 0'\n        WHEN [C%52WkRange] >= 0 AND [C%52WkRange] <= 12.5 THEN '0 - 12.5'\n        WHEN [C%52WkRange] > 12.5 AND [C%52WkRange] <= 25 THEN '12.5 - 25'\n        WHEN [C%52WkRange] > 25 AND [C%52WkRange] <= 37.5 THEN '25 - 37.5'\n        WHEN [C%52WkRange] > 37.5 AND [C%52WkRange] <= 50 THEN '37.5 - 50'\n        WHEN [C%52WkRange] > 50 AND [C%52WkRange] <= 62.5 THEN '50 - 62.5'\n        WHEN [C%52WkRange] > 62.5 AND [C%52WkRange] <= 75 THEN '62.5 - 75'\n        WHEN [C%52WkRange] > 75 AND [C%52WkRange] <= 87.5 THEN '75 - 87.5'\n        WHEN [C%52WkRange] > 87.5 AND [C%52WkRange] <= 100 THEN '87.5 - 100'\n        WHEN [C%52WkRange] > 100 THEN '> 100'\n    END) sub\non b.Signal = sub.Signal\nand b.Bin = sub.Bin\nwhere b.Signal = '52WkRange' and b.SecType = 'Stock'\n\nUNION ALL\n\nselect B.Signal, B.SecType, B.Bin, COALESCE(sub.BinCount, 0) AS BinCount\nfrom config.HistogramBins B\nLeft join (\nSELECT \n    'RVol' AS Signal,\n    [SecType],\n    CASE\n        WHEN [RVol] >= 0 AND [RVol] <= 1 THEN '0 - 1'\n        WHEN [RVol] > 1 AND [RVol] <= 2 THEN '1 - 2'\n        WHEN [RVol] > 2 AND [RVol] <= 3 THEN '2 - 3'\n        WHEN [RVol] > 3 AND [RVol] <= 4 THEN '3 - 4'\n        WHEN [RVol] > 4 AND [RVol] <= 5 THEN '4 - 5'\n        WHEN [RVol] > 5 THEN '> 5'\n    END AS Bin,\n    COUNT(*) AS BinCount\nFROM [analytics].[TodaySnapshot]\nWHERE [RVol] IS NOT NULL\nAND SecType = 'Stock'\nGROUP BY \n    [SecType],\n    CASE\n        WHEN [RVol] >= 0 AND [RVol] <= 1 THEN '0 - 1'\n        WHEN [RVol] > 1 AND [RVol] <= 2 THEN '1 - 2'\n        WHEN [RVol] > 2 AND [RVol] <= 3 THEN '2 - 3'\n        WHEN [RVol] > 3 AND [RVol] <= 4 THEN '3 - 4'\n        WHEN [RVol] > 4 AND [RVol] <= 5 THEN '4 - 5'\n        WHEN [RVol] > 5 THEN '> 5'\n    END) sub\non b.Signal = sub.Signal\nand b.Bin = sub.Bin\nwhere b.Signal = 'RVol' and b.SecType = 'Stock'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "TRUNCATE TABLE visual.StockHistogram",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": 2,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_generic_sql_db",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_generic_sql_table",
+						"type": "DatasetReference",
+						"parameters": {
+							"SchemaName": "visual",
+							"TableName": "StockHistogram"
+						}
+					}
+				]
+			},
+			{
+				"name": "StockRanking",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"additionalColumns": [
+							{
+								"name": "Updated",
+								"value": {
+									"value": "@convertTimeZone(utcnow(),'UTC','Central Standard Time')",
+									"type": "Expression"
+								}
+							}
+						],
+						"sqlReaderQuery": "WITH RankedTickers AS (\n    SELECT\n        'Highest' AS RankGroup,\n        '52WkRange' AS Signal,\n        [SecType],\n        [Ticker],\n        [C%52WkRange] as [Value],\n\t\tVolume,\n\t\t[Return]*100 as Change,\n\t\t[Close] as [Last],\n        ROW_NUMBER() OVER (PARTITION BY [SecType] ORDER BY [C%52WkRange] DESC) AS Rank\n    FROM [analytics].[TodaySnapshot]\n\tWHERE [C%52WkRange] is not NULL\n\tAND SecType = 'Stock'\n    UNION ALL\n    SELECT\n        'Lowest' AS RankGroup,\n        '52WkRange' AS Signal,\n        [SecType],\n        [Ticker],\n        [C%52WkRange] as [Value],\n\t\tVolume,\n\t\t[Return]*100 as Change,\n\t\t[Close] as [Last],\n        ROW_NUMBER() OVER (PARTITION BY [SecType] ORDER BY [C%52WkRange] ASC) AS Rank\n    FROM [analytics].[TodaySnapshot]\n\tWHERE [C%52WkRange] is not NULL\n\tAND SecType = 'Stock'\n    UNION ALL\n    SELECT\n        'Highest' AS RankGroup,\n        'KCPos' AS Signal,\n        [SecType],\n        [Ticker],\n        [KCPos] as [Value],\n\t\tVolume,\n\t\t[Return]*100 as Change,\n\t\t[Close] as [Last],\n        ROW_NUMBER() OVER (PARTITION BY [SecType] ORDER BY [KCPos] DESC) AS Rank\n    FROM [analytics].[TodaySnapshot]\n\tWHERE [KCPos] is not NULL\n\tAND SecType = 'Stock'\n    UNION ALL\n    SELECT\n        'Lowest' AS RankGroup,\n        'KCPos' AS Signal,\n        [SecType],\n        [Ticker],\n        [KCPos] as [Value],\n\t\tVolume,\n\t\t[Return]*100 as Change,\n\t\t[Close] as [Last],\n        ROW_NUMBER() OVER (PARTITION BY [SecType] ORDER BY [KCPos] ASC) AS Rank\n    FROM [analytics].[TodaySnapshot]\n\tWHERE [KCPos] is not NULL\n\tAND SecType = 'Stock'\n    UNION ALL\n    SELECT\n        'Highest' AS RankGroup,\n        'SigmaSpike' AS Signal,\n        [SecType],\n        [Ticker],\n        [SigmaSpike] as [Value],\n\t\tVolume,\n\t\t[Return]*100 as Change,\n\t\t[Close] as [Last],\n        ROW_NUMBER() OVER (PARTITION BY [SecType] ORDER BY [SigmaSpike] DESC) AS Rank\n    FROM [analytics].[TodaySnapshot]\n\tWHERE [SigmaSpike] is not NULL\n\tAND SecType = 'Stock'\n    UNION ALL\n    SELECT\n        'Lowest' AS RankGroup,\n        'SigmaSpike' AS Signal,\n        [SecType],\n        [Ticker],\n        [SigmaSpike] as [Value],\n\t\tVolume,\n\t\t[Return]*100 as Change,\n\t\t[Close] as [Last],\n        ROW_NUMBER() OVER (PARTITION BY [SecType] ORDER BY [SigmaSpike] ASC) AS Rank\n    FROM [analytics].[TodaySnapshot]\n\tWHERE [SigmaSpike] is not NULL\n\tAND SecType = 'Stock'\n    UNION ALL\n    SELECT\n        'Highest' AS RankGroup,\n        'RVol' AS Signal,\n        [SecType],\n        [Ticker],\n        [RVol] as [Value],\n\t\tVolume,\n\t\t[Return]*100 as Change,\n\t\t[Close] as [Last],\n        ROW_NUMBER() OVER (PARTITION BY [SecType] ORDER BY [RVol] DESC) AS Rank\n    FROM [analytics].[TodaySnapshot]\n\tWHERE [RVol] is not NULL\n\tAND SecType = 'Stock'\n)\nSELECT\n    Signal,\n    R.SecType,\n    R.Ticker,\n    RankGroup,\n\t[Rank],\n\t[Value],\n\tVolume,\n\tChange,\n\t[Last],\n\tT.Sector,\n\tP.OneMonthPrices as 'Prices'\nFROM RankedTickers R\nLEFT JOIN analytics.AggPrices P on R.Ticker = P.Ticker AND R.SecType = P.SecType\nLEFT JOIN raw.Tickers T on T.Ticker = R.Ticker\nWHERE Rank <= 10\nORDER BY Signal, SecType, RankGroup, Rank",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "TRUNCATE TABLE visual.StockRanking",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": 2,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_generic_sql_db",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_generic_sql_table",
+						"type": "DatasetReference",
+						"parameters": {
+							"SchemaName": "visual",
+							"TableName": "StockRanking"
+						}
+					}
+				]
+			},
+			{
+				"name": "CandlestickChart",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"additionalColumns": [
+							{
+								"name": "Updated",
+								"value": {
+									"value": "@convertTimeZone(utcnow(),'UTC','Central Standard Time')",
+									"type": "Expression"
+								}
+							}
+						],
+						"sqlReaderQuery": "select  P.Ticker, T.Name, T.SecType,[Date], [Open], [High], [Low], [Close],[Return], Volume \n    from raw.Prices P Left Join raw.Tickers T on P.Ticker = T.Ticker \n        where T.SecType = 'Index'\n            AND [Date] >= DATEADD(month, -2, GETDATE())\nUNION ALL\nselect  P.Ticker, T.ShortName as 'Name', T.SecType,[Date], [Open], [High], [Low], [Close],[Return], Volume\n    from raw.Prices P Left Join config.TickerShortNames T on P.Ticker = T.Ticker\n        where T.SecType = 'ETF'\n            AND [Date] >= DATEADD(month, -2, GETDATE())\n\t\t\tAND P.Ticker LIKE 'XL%'\nORDER BY Ticker, Date",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "TRUNCATE TABLE visual.CandlestickChart",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": 2,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_generic_sql_db",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_generic_sql_table",
+						"type": "DatasetReference",
+						"parameters": {
+							"SchemaName": "visual",
+							"TableName": "CandlestickChart"
+						}
+					}
+				]
+			},
+			{
+				"name": "PerformanceTable",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"additionalColumns": [
+							{
+								"name": "Updated",
+								"value": {
+									"value": "@convertTimeZone(utcnow(),'UTC','Central Standard Time')",
+									"type": "Expression"
+								}
+							}
+						],
+						"sqlReaderQuery": "select T.Name, S.Ticker,S.SecType, S.[Return]  as 'OneDayReturn', R.OneWeekReturn,\n      R.OneMonthReturn, R.OneQuarterReturn\n        , R.OneYearReturn, S.SigmaSpike, S.KCPos as 'MonthRange', S.[C%52WkRange] as 'YearRange'\n    from analytics.TodaySnapshot S\n    left join raw.Tickers T on T.Ticker = S.Ticker \n    left join analytics.AggReturns R on R.Ticker  = S.Ticker\n        where S.SecType = 'Index'\n\nUNION ALL\n\nselect T.Name, S.Ticker,S.SecType, S.[Return] as 'OneDayReturn', R.OneWeekReturn,\n      R.OneMonthReturn, R.OneQuarterReturn\n        , R.OneYearReturn, S.SigmaSpike, S.KCPos as 'MonthRange', S.[C%52WkRange] as 'YearRange'\n    from analytics.TodaySnapshot S\n    left join raw.Tickers T on T.Ticker = S.Ticker \n    left join analytics.AggReturns R on R.Ticker  = S.Ticker\n        where S.SecType = 'ETF' AND S.Ticker LIKE 'XL%'\n            Order by S.Ticker",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "TRUNCATE TABLE visual.PerformanceTable",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": 2,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_generic_sql_db",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_generic_sql_table",
+						"type": "DatasetReference",
+						"parameters": {
+							"SchemaName": "visual",
+							"TableName": "PerformanceTable"
+						}
+					}
+				]
+			},
+			{
+				"name": "StockHeatmap",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"additionalColumns": [
+							{
+								"name": "Updated",
+								"value": {
+									"value": "@convertTimeZone(utcnow(),'UTC','Central Standard Time')",
+									"type": "Expression"
+								}
+							}
+						],
+						"sqlReaderQuery": "select TOP 1000 S.Ticker,S.SecType,S.[Return], COALESCE(S.SigmaSpike, 0) as SigmaSpike, T.Sector, T.Industry, T.MarketCap\n    from analytics.TodaySnapshot S\n    left join raw.Tickers T on T.Ticker = S.Ticker \n    where S.SecType = 'Stock'\n    order by MarketCap desc",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "TRUNCATE TABLE visual.StockHeatmap",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": 2,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_generic_sql_db",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_generic_sql_table",
+						"type": "DatasetReference",
+						"parameters": {
+							"SchemaName": "visual",
+							"TableName": "StockHeatmap"
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "Presentation"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-07-18T03:27:51Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

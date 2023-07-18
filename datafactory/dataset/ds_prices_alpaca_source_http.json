@@ -1,0 +1,22 @@
+{
+	"name": "ds_prices_alpaca_source_http",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_funcapp",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "func-get-prices-alpaca?code=QExYJXb5FuMgUUC9Yk-pfh0x5sG5JyxblrFjboeDbeHBAzFulmweqw==",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
