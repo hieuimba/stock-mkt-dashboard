@@ -1622,7 +1622,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/main_pipeline_eod')]",
+			"name": "[concat(parameters('factoryName'), '/main_pipeline_EOD')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -1748,7 +1748,7 @@
 				"pipelines": [
 					{
 						"pipelineReference": {
-							"referenceName": "main_pipeline_eod",
+							"referenceName": "main_pipeline_EOD",
 							"type": "PipelineReference"
 						},
 						"parameters": {}
@@ -1780,7 +1780,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/main_pipeline_eod')]"
+				"[concat(variables('factoryId'), '/pipelines/main_pipeline_EOD')]"
 			]
 		}
 	]
