@@ -1,5 +1,5 @@
 {
-	"name": "main_pipeline_eod",
+	"name": "main_pipeline_EOD",
 	"properties": {
 		"activities": [
 			{

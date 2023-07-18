@@ -6,7 +6,7 @@
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "main_pipeline_eod",
+					"referenceName": "main_pipeline_EOD",
 					"type": "PipelineReference"
 				}
 			}
