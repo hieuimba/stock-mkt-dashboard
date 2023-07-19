@@ -9,11 +9,13 @@
 		},
 		"ls_blob_storage_connectionString": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'ls_blob_storage'"
+			"metadata": "Secure string for 'connectionString' of 'ls_blob_storage'",
+			"defaultValue": "DefaultEndpointsProtocol=https;AccountName=rgfindashdevstorage;EndpointSuffix=core.windows.net;"
 		},
 		"ls_sql_server_connectionString": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'ls_sql_server'"
+			"metadata": "Secure string for 'connectionString' of 'ls_sql_server'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sqlsv-findash-dev.database.windows.net;Initial Catalog=db-findash-dev;User ID=hieungo"
 		},
 		"ls_funcapp_properties_typeProperties_url": {
 			"type": "string",
@@ -33,19 +35,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/ls_blob_storage')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('ls_blob_storage_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/ls_funcapp')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -56,19 +45,6 @@
 					"url": "[parameters('ls_funcapp_properties_typeProperties_url')]",
 					"enableServerCertificateValidation": true,
 					"authenticationType": "Anonymous"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ls_sql_server')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('ls_sql_server_connectionString')]"
 				}
 			},
 			"dependsOn": []
@@ -85,6 +61,162 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_prices_alpaca_source_http')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_funcapp",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "func-get-prices-alpaca?code=QExYJXb5FuMgUUC9Yk-pfh0x5sG5JyxblrFjboeDbeHBAzFulmweqw==",
+							"type": "Expression"
+						}
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_prices_yfin_source_http')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_funcapp",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "func-get-prices-yfin?code=9icmNJb9M7CeueZ08Q4PuxyXGZpp-QatCjXT3nfTS8UaAzFuGXgZbg==",
+							"type": "Expression"
+						}
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_tickers_list_source_http')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_funcapp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Exchange": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "@concat('func-get-tickers-list/',dataset().Exchange,'?code=Q_g8e-jjMwVLcToQsvr2gccq3Dc8RngzR9CwAPPJffZfAzFu1Qcl2g==')",
+							"type": "Expression"
+						}
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_blob_storage')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('ls_blob_storage_connectionString')]",
+					"accountKey": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "lv_key_vault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "BlobStorageKey"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/lv_key_vault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_funcapp_rest_api')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('ls_funcapp_rest_api_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous",
+					"authHeaders": {
+						"ocp-apim-subscription-key": {
+							"type": "AzureKeyVaultSecret",
+							"store": {
+								"referenceName": "lv_key_vault",
+								"type": "LinkedServiceReference"
+							},
+							"secretName": "FuncAppAPIKey"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/lv_key_vault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_sql_server')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('ls_sql_server_connectionString')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "lv_key_vault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "SQLDatabasePassword"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/lv_key_vault')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ds_custom_lists_source_blob')]",
@@ -191,113 +323,71 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_prices_alpaca_source_http')]",
+			"name": "[concat(parameters('factoryName'), '/ds_prices_alpaca_source_rest_api')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_funcapp",
+					"referenceName": "ls_funcapp_rest_api",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
-				"type": "Json",
+				"type": "RestResource",
 				"typeProperties": {
-					"location": {
-						"type": "HttpServerLocation",
-						"relativeUrl": {
-							"value": "func-get-prices-alpaca?code=QExYJXb5FuMgUUC9Yk-pfh0x5sG5JyxblrFjboeDbeHBAzFulmweqw==",
-							"type": "Expression"
-						}
-					}
+					"relativeUrl": "func-get-prices-alpaca"
 				},
-				"schema": {}
+				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp_rest_api')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_prices_yfin_source_http')]",
+			"name": "[concat(parameters('factoryName'), '/ds_prices_yfin_source_rest_api')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_funcapp",
+					"referenceName": "ls_funcapp_rest_api",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
-				"type": "Json",
+				"type": "RestResource",
 				"typeProperties": {
-					"location": {
-						"type": "HttpServerLocation",
-						"relativeUrl": {
-							"value": "func-get-prices-yfin?code=9icmNJb9M7CeueZ08Q4PuxyXGZpp-QatCjXT3nfTS8UaAzFuGXgZbg==",
-							"type": "Expression"
-						}
-					}
+					"relativeUrl": "func-get-prices-yfin"
 				},
-				"schema": {}
+				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp_rest_api')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_tickers_list_source_http')]",
+			"name": "[concat(parameters('factoryName'), '/ds_tickers_list_source_rest_api')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_funcapp",
+					"referenceName": "ls_funcapp_rest_api",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
 					"Exchange": {
-						"type": "String"
+						"type": "string"
 					}
 				},
 				"annotations": [],
-				"type": "Json",
+				"type": "RestResource",
 				"typeProperties": {
-					"location": {
-						"type": "HttpServerLocation",
-						"relativeUrl": {
-							"value": "@concat('func-get-tickers-list/',dataset().Exchange,'?code=Q_g8e-jjMwVLcToQsvr2gccq3Dc8RngzR9CwAPPJffZfAzFu1Qcl2g==')",
-							"type": "Expression"
-						}
+					"relativeUrl": {
+						"value": "@concat('func-get-tickers-list/',dataset().Exchange)",
+						"type": "Expression"
 					}
 				},
-				"schema": {}
+				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ls_funcapp_rest_api')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "RestService",
-				"typeProperties": {
-					"url": "[parameters('ls_funcapp_rest_api_properties_typeProperties_url')]",
-					"enableServerCertificateValidation": true,
-					"authenticationType": "Anonymous",
-					"authHeaders": {
-						"ocp-apim-subscription-key": {
-							"type": "AzureKeyVaultSecret",
-							"store": {
-								"referenceName": "lv_key_vault",
-								"type": "LinkedServiceReference"
-							},
-							"secretName": "FuncAppAPIKey"
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/lv_key_vault')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp_rest_api')]"
 			]
 		},
 		{
@@ -869,74 +959,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_generic_sql_db')]",
 				"[concat(variables('factoryId'), '/datasets/ds_generic_sql_table')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_prices_alpaca_source_rest_api')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_funcapp_rest_api",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {
-					"relativeUrl": "func-get-prices-alpaca"
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp_rest_api')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_prices_yfin_source_rest_api')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_funcapp_rest_api",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {
-					"relativeUrl": "func-get-prices-yfin"
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp_rest_api')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_tickers_list_source_rest_api')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_funcapp_rest_api",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"Exchange": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {
-					"relativeUrl": {
-						"value": "@concat('func-get-tickers-list/',dataset().Exchange)",
-						"type": "Expression"
-					}
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp_rest_api')]"
 			]
 		},
 		{

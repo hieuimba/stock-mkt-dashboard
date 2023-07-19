@@ -6,10 +6,10 @@
 			"value": "df-findash-dev"
 		},
 		"ls_blob_storage_connectionString": {
-			"value": ""
+			"value": "DefaultEndpointsProtocol=https;AccountName=rgfindashdevstorage;EndpointSuffix=core.windows.net;"
 		},
 		"ls_sql_server_connectionString": {
-			"value": ""
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sqlsv-findash-dev.database.windows.net;Initial Catalog=db-findash-dev;User ID=hieungo"
 		},
 		"ls_funcapp_properties_typeProperties_url": {
 			"value": "https://funcapp-findash-dev.azurewebsites.net/api/"
