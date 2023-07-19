@@ -898,6 +898,74 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_prices_alpaca_source_rest_api')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_funcapp_rest_api",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {
+					"relativeUrl": "func-get-prices-alpaca"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp_rest_api')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_prices_yfin_source_rest_api')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_funcapp_rest_api",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {
+					"relativeUrl": "func-get-prices-yfin"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp_rest_api')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_tickers_list_source_rest_api')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_funcapp_rest_api",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Exchange": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {
+					"relativeUrl": {
+						"value": "@concat('func-get-tickers-list/',dataset().Exchange)",
+						"type": "Expression"
+					}
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp_rest_api')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/get_raw_prices')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1038,18 +1106,16 @@
 									"userProperties": [],
 									"typeProperties": {
 										"source": {
-											"type": "JsonSource",
-											"storeSettings": {
-												"type": "HttpReadSettings",
-												"requestMethod": "POST",
-												"requestBody": {
-													"value": "@{json(concat('{\"tickers\":' ,activity('lookup_tickers').output.value ,'}'))}",
-													"type": "Expression"
-												},
-												"requestTimeout": ""
+											"type": "RestSource",
+											"httpRequestTimeout": "01:00:00",
+											"requestInterval": "00.00:00:00.010",
+											"requestMethod": "POST",
+											"requestBody": {
+												"value": "@{json(concat('{\"tickers\":' ,activity('lookup_tickers').output.value ,'}'))}",
+												"type": "Expression"
 											},
-											"formatSettings": {
-												"type": "JsonReadSettings"
+											"paginationRules": {
+												"supportRFC5988": "true"
 											}
 										},
 										"sink": {
@@ -1063,7 +1129,7 @@
 									},
 									"inputs": [
 										{
-											"referenceName": "ds_prices_alpaca_source_http",
+											"referenceName": "ds_prices_alpaca_source_rest_api",
 											"type": "DatasetReference",
 											"parameters": {}
 										}
@@ -1140,18 +1206,16 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "JsonSource",
-								"storeSettings": {
-									"type": "HttpReadSettings",
-									"requestMethod": "POST",
-									"requestBody": {
-										"value": "@{json(concat('{\"tickers\":' ,activity('lookup_index_tickers').output.value ,'}'))}",
-										"type": "Expression"
-									},
-									"requestTimeout": ""
+								"type": "RestSource",
+								"httpRequestTimeout": "01:00:00",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "POST",
+								"requestBody": {
+									"value": "@{json(concat('{\"tickers\":' ,activity('lookup_index_tickers').output.value ,'}'))}",
+									"type": "Expression"
 								},
-								"formatSettings": {
-									"type": "JsonReadSettings"
+								"paginationRules": {
+									"supportRFC5988": "true"
 								}
 							},
 							"sink": {
@@ -1164,7 +1228,7 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "ds_prices_yfin_source_http",
+								"referenceName": "ds_prices_yfin_source_rest_api",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -1194,9 +1258,9 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_sql_server')]",
 				"[concat(variables('factoryId'), '/datasets/ds_generic_sql_db')]",
-				"[concat(variables('factoryId'), '/datasets/ds_prices_yfin_source_http')]",
+				"[concat(variables('factoryId'), '/datasets/ds_prices_yfin_source_rest_api')]",
 				"[concat(variables('factoryId'), '/datasets/ds_generic_sql_table')]",
-				"[concat(variables('factoryId'), '/datasets/ds_prices_alpaca_source_http')]"
+				"[concat(variables('factoryId'), '/datasets/ds_prices_alpaca_source_rest_api')]"
 			]
 		},
 		{
@@ -1238,14 +1302,12 @@
 									"userProperties": [],
 									"typeProperties": {
 										"source": {
-											"type": "JsonSource",
-											"storeSettings": {
-												"type": "HttpReadSettings",
-												"requestMethod": "POST",
-												"requestTimeout": "1.00:00:00"
-											},
-											"formatSettings": {
-												"type": "JsonReadSettings"
+											"type": "RestSource",
+											"httpRequestTimeout": "01:00:00",
+											"requestInterval": "00.00:00:00.010",
+											"requestMethod": "POST",
+											"paginationRules": {
+												"supportRFC5988": "true"
 											}
 										},
 										"sink": {
@@ -1260,7 +1322,7 @@
 									},
 									"inputs": [
 										{
-											"referenceName": "ds_tickers_list_source_http",
+											"referenceName": "ds_tickers_list_source_rest_api",
 											"type": "DatasetReference",
 											"parameters": {
 												"Exchange": {
@@ -1692,140 +1754,7 @@
 				"[concat(variables('factoryId'), '/linkedServices/ls_sql_server')]",
 				"[concat(variables('factoryId'), '/datasets/ds_custom_lists_source_blob')]",
 				"[concat(variables('factoryId'), '/datasets/ds_generic_sql_table')]",
-				"[concat(variables('factoryId'), '/datasets/ds_tickers_list_source_http')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_prices_alpaca_source_rest_api')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_funcapp_rest_api",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {
-					"relativeUrl": "func-get-prices-alpaca"
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp_rest_api')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/get_raw_prices_copy1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "lookup_tickers",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT Ticker\nFROM raw.Tickers WHERE Ticker = 'AAPL'",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "ds_generic_sql_db",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "copy_prices",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "lookup_tickers",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 3,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "RestSource",
-								"httpRequestTimeout": "01:00:00",
-								"requestInterval": "00.00:00:00.010",
-								"requestMethod": "POST",
-								"requestBody": {
-									"value": "@{json(concat('{\"tickers\":' ,activity('lookup_tickers').output.value ,'}'))}",
-									"type": "Expression"
-								},
-								"paginationRules": {
-									"supportRFC5988": "true"
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false,
-								"disableMetricsCollection": false
-							},
-							"enableStaging": false,
-							"dataIntegrationUnits": 2
-						},
-						"inputs": [
-							{
-								"referenceName": "ds_prices_alpaca_source_rest_api",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "ds_generic_sql_table",
-								"type": "DatasetReference",
-								"parameters": {
-									"SchemaName": "raw",
-									"TableName": "Prices_test"
-								}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"folder": {
-					"name": "Staging"
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-07-18T03:12:59Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_generic_sql_db')]",
-				"[concat(variables('factoryId'), '/datasets/ds_prices_alpaca_source_rest_api')]",
-				"[concat(variables('factoryId'), '/datasets/ds_generic_sql_table')]"
+				"[concat(variables('factoryId'), '/datasets/ds_tickers_list_source_rest_api')]"
 			]
 		},
 		{
@@ -1902,47 +1831,6 @@
 				"[concat(variables('factoryId'), '/pipelines/get_raw_prices')]",
 				"[concat(variables('factoryId'), '/pipelines/create_analytics_layer')]",
 				"[concat(variables('factoryId'), '/pipelines/create_presentation_layer')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/trigger_weekly')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "get_tickers_list_EOW",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Week",
-						"interval": 1,
-						"startTime": "2023-06-11T21:25:00",
-						"timeZone": "Central Standard Time",
-						"schedule": {
-							"minutes": [
-								0
-							],
-							"hours": [
-								18
-							],
-							"weekDays": [
-								"Sunday"
-							]
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/get_tickers_list_EOW')]"
 			]
 		}
 	]
