@@ -1,0 +1,15 @@
+{
+	"name": "ds_prices_alpaca_source_rest_api",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_funcapp_rest_api",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": "func-get-prices-alpaca"
+		},
+		"schema": []
+	}
+}
