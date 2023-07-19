@@ -1,0 +1,23 @@
+{
+	"name": "ds_tickers_list_source_rest_api",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_funcapp_rest_api",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Exchange": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@concat('func-get-tickers-list/',dataset().Exchange)",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	}
+}
