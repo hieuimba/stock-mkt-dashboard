@@ -1,0 +1,10 @@
+{
+	"name": "lv_key_vault",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://kv-findash-dev.vault.azure.net/"
+		}
+	}
+}
