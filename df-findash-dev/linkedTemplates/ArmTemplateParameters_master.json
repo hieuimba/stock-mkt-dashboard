@@ -5,17 +5,11 @@
 		"factoryName": {
 			"value": "df-findash-dev"
 		},
-		"AzureFunction1_functionKey": {
-			"value": ""
-		},
 		"ls_blob_storage_connectionString": {
 			"value": ""
 		},
 		"ls_sql_server_connectionString": {
 			"value": ""
-		},
-		"AzureFunction1_properties_typeProperties_functionAppUrl": {
-			"value": "https://funcapp-findash-dev.azurewebsites.net"
 		},
 		"ls_funcapp_properties_typeProperties_url": {
 			"value": "https://funcapp-findash-dev.azurewebsites.net/api/"
