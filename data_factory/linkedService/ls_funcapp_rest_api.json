@@ -1,0 +1,22 @@
+{
+	"name": "ls_funcapp_rest_api",
+	"properties": {
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://api-mgmt-findash-dev.azure-api.net/funcapp-findash-dev/",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous",
+			"authHeaders": {
+				"ocp-apim-subscription-key": {
+					"type": "AzureKeyVaultSecret",
+					"store": {
+						"referenceName": "lv_key_vault",
+						"type": "LinkedServiceReference"
+					},
+					"secretName": "FuncAppAPIKey"
+				}
+			}
+		}
+	}
+}
