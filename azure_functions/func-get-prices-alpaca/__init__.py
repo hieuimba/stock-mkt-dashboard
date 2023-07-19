@@ -19,7 +19,7 @@ api = REST(
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    # retrieve, format tickers list request body
+    # retrieve, format tickers list
     tickers = req.get_json().get("tickers")
 
     if tickers == []:
