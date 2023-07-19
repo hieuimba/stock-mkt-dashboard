@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import json
 import pandas as pd
 import azure.functions as func
+import os
 
 pd.set_option("display.max_columns", None)
 
@@ -12,8 +13,8 @@ last_year_date = current_date - timedelta(days=365)
 last_year_date_string = last_year_date.strftime("%Y-%m-%d")
 
 api = REST(
-    key_id="PKT4S1HDLA809BR0WR7B",
-    secret_key="HN7M5j3goZlHgSbWOCNW630fIV9s3QPQRfU5FzUR",
+    key_id=os.getenv("AlpacaKeyID"),
+    secret_key=os.getenv("AlpacaSecretKey"),
     base_url="https://paper-api.alpaca.markets",
 )
 
