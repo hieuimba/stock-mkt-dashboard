@@ -4,7 +4,7 @@ Data Engineering Project with Azure stack
 https://stock-mkt-dashboard.streamlit.app/
 
 ## Description
-This project provides a daily summary of the US Stock Market to assist traders and investors make better trading decisions. Information is aggregated based on end-of-day index, ETF, and stock prices in order to visualize:
+This project provides a daily summary of the US Stock Market to assist traders and investors make better trading decisions. Information is aggregated based on end-of-day index, ETF, and stock prices to visualize:
 
 -   Broad market performance and trend
 -   One-day returns of major indexes and sectors
