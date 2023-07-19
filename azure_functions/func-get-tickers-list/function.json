@@ -1,0 +1,22 @@
+{
+  "scriptFile": "__init__.py",
+  "functionTimeout": "00:10:00",
+  "bindings": [
+    {
+      "authLevel": "function",
+      "type": "httpTrigger",
+      "direction": "in",
+      "name": "req",
+      "methods": [
+        "get",
+        "post"
+      ],
+      "route": "func-get-tickers-list/{exchange:alpha}"
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "$return"
+    }
+  ]
+}

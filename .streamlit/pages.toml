@@ -1,16 +1,16 @@
 
 [[pages]]
-path = "st_pages/broad_mkt.py"
+path = "streamlit_app/st_pages/broad_mkt.py"
 name = "Broad Market"
 
 [[pages]]
-path = "st_pages/sector.py"
+path = "streamlit_app/st_pages/sector.py"
 name = "Sector Analysis"
 
 [[pages]]
-path = "streamlit_app.py"
+path = "streamlit_app/streamlit_app.py"
 name = "Stock Analysis"
 
 [[pages]]
-path = "st_pages/glossary.py"
+path = "streamlit_app/st_pages/glossary.py"
 name =  "Glossary"
