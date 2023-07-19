@@ -136,18 +136,16 @@
 							"userProperties": [],
 							"typeProperties": {
 								"source": {
-									"type": "JsonSource",
-									"storeSettings": {
-										"type": "HttpReadSettings",
-										"requestMethod": "POST",
-										"requestBody": {
-											"value": "@{json(concat('{\"tickers\":' ,activity('lookup_tickers').output.value ,'}'))}",
-											"type": "Expression"
-										},
-										"requestTimeout": ""
+									"type": "RestSource",
+									"httpRequestTimeout": "01:00:00",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "POST",
+									"requestBody": {
+										"value": "@{json(concat('{\"tickers\":' ,activity('lookup_tickers').output.value ,'}'))}",
+										"type": "Expression"
 									},
-									"formatSettings": {
-										"type": "JsonReadSettings"
+									"paginationRules": {
+										"supportRFC5988": "true"
 									}
 								},
 								"sink": {
@@ -161,7 +159,7 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "ds_prices_alpaca_source_http",
+									"referenceName": "ds_prices_alpaca_source_rest_api",
 									"type": "DatasetReference"
 								}
 							],
