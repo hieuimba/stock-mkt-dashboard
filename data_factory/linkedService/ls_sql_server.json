@@ -1,12 +1,19 @@
 {
 	"name": "ls_sql_server",
-	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"annotations": [],
 		"type": "AzureSqlDatabase",
 		"typeProperties": {
-			"connectionString": "integrated security=False;encrypt=True;connection timeout=30;data source=sqlsv-findash-dev.database.windows.net;initial catalog=db-findash-dev;user id=hieungo",
-			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDVBNDFGRjI2LTJFMTktNEJEQy05MDczLUY4NDc4RTcwQzdFQV9lNGUzMmRmNy1kZjNmLTQ5ZTItODZmOC1lMjI3ODdlMjcyM2MiDQp9"
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sqlsv-findash-dev.database.windows.net;Initial Catalog=db-findash-dev;User ID=hieungo",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "lv_key_vault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "SQLDatabasePassword"
+			}
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }
