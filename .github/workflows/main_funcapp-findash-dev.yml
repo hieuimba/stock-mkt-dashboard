@@ -8,11 +8,13 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "azure_functions/**"
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
-  PYTHON_VERSION: '3.10' # set this to the python version to use (supports 3.6, 3.7, 3.8)
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: "azure_functions" # set this to the path to your web app project, defaults to the repository root
+  PYTHON_VERSION: "3.10" # set this to the python version to use (supports 3.6, 3.7, 3.8)
 
 jobs:
   build:
@@ -32,8 +34,8 @@ jobs:
           source venv/bin/activate
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
-        
+        run: pip install -r azure_functions/requirements.txt
+
       # Optional: Add step to run tests here
 
       - name: Upload artifact for deployment job
@@ -48,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'Production'
+      name: "Production"
       url: ${{ steps.deploy-to-function.outputs.webapp-url }}
 
     steps:
@@ -58,12 +60,12 @@ jobs:
           name: python-app
           path: .
 
-      - name: 'Deploy to Azure Functions'
+      - name: "Deploy to Azure Functions"
         uses: Azure/functions-action@v1
         id: deploy-to-function
         with:
-          app-name: 'funcapp-findash-dev'
-          slot-name: 'Production'
+          app-name: "funcapp-findash-dev"
+          slot-name: "Production"
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AB8B210B92494BE394DF0183924092BE }}
           scm-do-build-during-deployment: true
