@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "df-findash-dev"
 		},
+		"AzureFunction1_functionKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'functionKey' of 'AzureFunction1'"
+		},
 		"ls_blob_storage_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_blob_storage'"
@@ -15,15 +19,45 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_sql_server'"
 		},
+		"AzureFunction1_properties_typeProperties_functionAppUrl": {
+			"type": "string",
+			"defaultValue": "https://funcapp-findash-dev.azurewebsites.net"
+		},
 		"ls_funcapp_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://funcapp-findash-dev.azurewebsites.net/api/"
+		},
+		"lv_key_vault_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://kv-findash-dev.vault.azure.net/"
+		},
+		"ls_funcapp_rest_api_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api-mgmt-findash-dev.azure-api.net/funcapp-findash-dev/"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureFunction1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureFunction",
+				"typeProperties": {
+					"functionAppUrl": "[parameters('AzureFunction1_properties_typeProperties_functionAppUrl')]",
+					"functionKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureFunction1_functionKey')]"
+					},
+					"authentication": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ls_blob_storage')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -61,6 +95,19 @@
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
 					"connectionString": "[parameters('ls_sql_server_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/lv_key_vault')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('lv_key_vault_properties_typeProperties_baseUrl')]"
 				}
 			},
 			"dependsOn": []
@@ -250,6 +297,33 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_funcapp_rest_api')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('ls_funcapp_rest_api_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous",
+					"authHeaders": {
+						"ocp-apim-subscription-key": {
+							"type": "AzureKeyVaultSecret",
+							"store": {
+								"referenceName": "lv_key_vault",
+								"type": "LinkedServiceReference"
+							},
+							"secretName": "FuncAppAPIKey"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/lv_key_vault')]"
 			]
 		},
 		{
@@ -1622,6 +1696,139 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_prices_alpaca_source_rest_api')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_funcapp_rest_api",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {
+					"relativeUrl": "func-get-prices-alpaca"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp_rest_api')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/get_raw_prices_copy1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "lookup_tickers",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT Ticker\nFROM raw.Tickers WHERE Ticker = 'AAPL'",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_generic_sql_db",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "copy_prices",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "lookup_tickers",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 3,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "01:00:00",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "POST",
+								"requestBody": {
+									"value": "@{json(concat('{\"tickers\":' ,activity('lookup_tickers').output.value ,'}'))}",
+									"type": "Expression"
+								},
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"dataIntegrationUnits": 2
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_prices_alpaca_source_rest_api",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_generic_sql_table",
+								"type": "DatasetReference",
+								"parameters": {
+									"SchemaName": "raw",
+									"TableName": "Prices_test"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "Staging"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-07-18T03:12:59Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_generic_sql_db')]",
+				"[concat(variables('factoryId'), '/datasets/ds_prices_alpaca_source_rest_api')]",
+				"[concat(variables('factoryId'), '/datasets/ds_generic_sql_table')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/main_pipeline_EOD')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1736,51 +1943,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/get_tickers_list_EOW')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/trigger_daily')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "main_pipeline_EOD",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Week",
-						"interval": 1,
-						"startTime": "2023-06-11T21:27:00",
-						"timeZone": "Central Standard Time",
-						"schedule": {
-							"minutes": [
-								0
-							],
-							"hours": [
-								16
-							],
-							"weekDays": [
-								"Monday",
-								"Tuesday",
-								"Wednesday",
-								"Thursday",
-								"Friday"
-							]
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/main_pipeline_EOD')]"
 			]
 		}
 	]

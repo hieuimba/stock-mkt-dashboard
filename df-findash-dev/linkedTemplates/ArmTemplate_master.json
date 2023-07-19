@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "df-findash-dev"
 		},
+		"AzureFunction1_functionKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'functionKey' of 'AzureFunction1'"
+		},
 		"ls_blob_storage_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_blob_storage'"
@@ -15,9 +19,21 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_sql_server'"
 		},
+		"AzureFunction1_properties_typeProperties_functionAppUrl": {
+			"type": "string",
+			"defaultValue": "https://funcapp-findash-dev.azurewebsites.net"
+		},
 		"ls_funcapp_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://funcapp-findash-dev.azurewebsites.net/api/"
+		},
+		"ls_funcapp_rest_api_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api-mgmt-findash-dev.azure-api.net/funcapp-findash-dev/"
+		},
+		"lv_key_vault_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://kv-findash-dev.vault.azure.net/"
 		},
 		"containerUri": {
 			"type": "string",
@@ -46,18 +62,50 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"AzureFunction1_functionKey": {
+						"value": "[parameters('AzureFunction1_functionKey')]"
+					},
 					"ls_blob_storage_connectionString": {
 						"value": "[parameters('ls_blob_storage_connectionString')]"
 					},
 					"ls_sql_server_connectionString": {
 						"value": "[parameters('ls_sql_server_connectionString')]"
 					},
+					"AzureFunction1_properties_typeProperties_functionAppUrl": {
+						"value": "[parameters('AzureFunction1_properties_typeProperties_functionAppUrl')]"
+					},
 					"ls_funcapp_properties_typeProperties_url": {
 						"value": "[parameters('ls_funcapp_properties_typeProperties_url')]"
+					},
+					"lv_key_vault_properties_typeProperties_baseUrl": {
+						"value": "[parameters('lv_key_vault_properties_typeProperties_baseUrl')]"
+					},
+					"ls_funcapp_rest_api_properties_typeProperties_url": {
+						"value": "[parameters('ls_funcapp_rest_api_properties_typeProperties_url')]"
 					}
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "df-findash-dev_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'df-findash-dev_ArmTemplate_0')]"
+			]
 		}
 	]
 }
