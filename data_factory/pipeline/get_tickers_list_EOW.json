@@ -35,14 +35,12 @@
 							"userProperties": [],
 							"typeProperties": {
 								"source": {
-									"type": "JsonSource",
-									"storeSettings": {
-										"type": "HttpReadSettings",
-										"requestMethod": "POST",
-										"requestTimeout": "1.00:00:00"
-									},
-									"formatSettings": {
-										"type": "JsonReadSettings"
+									"type": "RestSource",
+									"httpRequestTimeout": "01:00:00",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "POST",
+									"paginationRules": {
+										"supportRFC5988": "true"
 									}
 								},
 								"sink": {
@@ -57,7 +55,7 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "ds_tickers_list_source_http",
+									"referenceName": "ds_tickers_list_source_rest_api",
 									"type": "DatasetReference",
 									"parameters": {
 										"Exchange": {
