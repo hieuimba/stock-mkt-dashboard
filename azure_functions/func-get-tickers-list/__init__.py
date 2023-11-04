@@ -1,5 +1,6 @@
 import logging
 from finvizfinance.screener.overview import Overview
+import json
 
 import azure.functions as func
 
