@@ -15,6 +15,7 @@ darkgrey = "#171717"
 
 
 # Function to query data
+@st.cache_data(ttl=60 * 60, max_entries=20)
 def query(query: str) -> pd.DataFrame:
     url = st.secrets["DB_URL"]
     request = {"query": query}
