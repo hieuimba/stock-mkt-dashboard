@@ -210,3 +210,5 @@ with one_day_returns:
 
 date_timestamp = config.query(config.timestamp_query)["Date"][0]
 st.caption(f"Looking at major US indexes and ETFs. EOD data as of {date_timestamp}")
+
+config.clear_cache_if_needed(date_timestamp)

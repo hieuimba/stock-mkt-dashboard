@@ -4,16 +4,9 @@ import pandas as pd
 import requests
 from typing import List
 import re
+import pytz
+from datetime import datetime
 
-from datetime import datetime, timedelta
-
-
-# Function to get current datetime in UTC-6 timezone
-def get_current_datetime():
-    return (datetime.utcnow() - timedelta(hours=6)).strftime("%Y-%m-%d %H:%M:%S")
-
-
-st.sidebar.write(f"Current Time: {get_current_datetime()} UTC-6")
 # color settings:
 green = "#22c55e"
 red = "#ef4444"
@@ -24,12 +17,36 @@ darkgrey = "#171717"
 
 
 # Function to query data
-@st.cache_data(ttl=60 * 60 * 24, max_entries=20)
+@st.cache_data(ttl=60 * 60 * 12, max_entries=20)
 def query(query: str) -> pd.DataFrame:
     url = st.secrets["DB_URL"]
     request = {"query": query}
     response = json.loads(requests.post(url, json=request).content.decode("utf-8"))
     return pd.DataFrame(response)
+
+
+# Function to clear cache
+def clear_cache_if_needed(given_date_str: str):
+    # Parse the given string into a datetime object
+    given_date = datetime.strptime(given_date_str, "%Y-%m-%d")
+
+    # Get the current datetime in the time zone of Winnipeg
+    winnipeg_timezone = pytz.timezone("America/Winnipeg")
+    current_datetime_winnipeg = datetime.now(winnipeg_timezone)
+
+    # Set the time to 5 PM
+    target_time = current_datetime_winnipeg.replace(
+        hour=17, minute=0, second=0, microsecond=0
+    )
+
+    # Check if the given date is less than the current Winnipeg date and time is past 5 PM
+    if (
+        given_date < current_datetime_winnipeg.date()
+        and current_datetime_winnipeg >= target_time
+    ):
+        # Clear cache in Streamlit
+        st.success(f"Data refreshed for {given_date_str}")
+        st.cache_data.clear()
 
 
 # Function to convert string to array of floats
