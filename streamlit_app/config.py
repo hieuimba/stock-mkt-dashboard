@@ -30,12 +30,12 @@ def clear_cache_if_needed(given_date_str: str):
     # Parse the given string into a datetime object
     given_date = datetime.strptime(given_date_str, "%Y-%m-%d")
 
-    # Get the current datetime in the time zone of Winnipeg
+    # Get the current date in the time zone of Winnipeg
     winnipeg_timezone = pytz.timezone("America/Winnipeg")
     current_datetime_winnipeg = datetime.now(winnipeg_timezone)
 
-    # Make given_date aware of the same timezone as current_datetime_winnipeg
-    given_date = winnipeg_timezone.localize(given_date)
+    # Extract date component from current_datetime_winnipeg
+    current_date_winnipeg = current_datetime_winnipeg.date()
 
     # Set the time to 5 PM
     target_time = current_datetime_winnipeg.replace(
@@ -43,10 +43,7 @@ def clear_cache_if_needed(given_date_str: str):
     )
 
     # Check if the given date is less than the current Winnipeg date and time is past 5 PM
-    if (
-        given_date < current_datetime_winnipeg
-        and current_datetime_winnipeg >= target_time
-    ):
+    if given_date < current_date_winnipeg and current_datetime_winnipeg >= target_time:
         # Clear cache in Streamlit
         st.success(f"Data refreshed for {given_date_str}")
         st.cache_data.clear()
