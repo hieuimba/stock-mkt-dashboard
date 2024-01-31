@@ -28,7 +28,7 @@ def query(query: str) -> pd.DataFrame:
 # Function to clear cache
 def clear_cache_if_needed(given_date_str: str):
     # Parse the given string into a datetime object
-    given_date = datetime.strptime(given_date_str, "%Y-%m-%d")
+    given_date = datetime.strptime(given_date_str, "%Y-%m-%d").date()
 
     # Get the current date in the time zone of Winnipeg
     winnipeg_timezone = pytz.timezone("America/Winnipeg")
