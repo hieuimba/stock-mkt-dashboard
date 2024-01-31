@@ -5,6 +5,15 @@ import requests
 from typing import List
 import re
 
+from datetime import datetime, timedelta
+
+
+# Function to get current datetime in UTC-6 timezone
+def get_current_datetime():
+    return (datetime.utcnow() - timedelta(hours=6)).strftime("%Y-%m-%d %H:%M:%S")
+
+
+st.sidebar.write(f"Current Time: {get_current_datetime()} UTC-6")
 # color settings:
 green = "#22c55e"
 red = "#ef4444"
@@ -15,7 +24,7 @@ darkgrey = "#171717"
 
 
 # Function to query data
-@st.cache_data(ttl=60 * 60, max_entries=20)
+@st.cache_data(ttl=60 * 60 * 24, max_entries=20)
 def query(query: str) -> pd.DataFrame:
     url = st.secrets["DB_URL"]
     request = {"query": query}
