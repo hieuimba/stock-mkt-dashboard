@@ -34,6 +34,9 @@ def clear_cache_if_needed(given_date_str: str):
     winnipeg_timezone = pytz.timezone("America/Winnipeg")
     current_datetime_winnipeg = datetime.now(winnipeg_timezone)
 
+    # Make given_date aware of the same timezone as current_datetime_winnipeg
+    given_date = winnipeg_timezone.localize(given_date)
+
     # Set the time to 5 PM
     target_time = current_datetime_winnipeg.replace(
         hour=17, minute=0, second=0, microsecond=0
