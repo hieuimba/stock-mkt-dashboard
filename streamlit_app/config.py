@@ -41,7 +41,7 @@ def clear_cache_if_needed(given_date_str: str):
 
     # Check if the given date is less than the current Winnipeg date and time is past 5 PM
     if (
-        given_date < current_datetime_winnipeg.date()
+        given_date < current_datetime_winnipeg
         and current_datetime_winnipeg >= target_time
     ):
         # Clear cache in Streamlit
