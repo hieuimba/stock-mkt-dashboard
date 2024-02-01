@@ -32,7 +32,7 @@ The following technologies are used to build the project:
 -   Azure Data Factory: for data connectors, scheduling, orchestration
 -   SQL Database: for staging environment & data warehouse
 -   Azure Blob Storage: for miscellaneous & config files
--   Azure Logic Apps: for front-end API (more efficient than Azure Functions)
+-   Azure Logic Apps: for front-end API
 -   Streamlit Cloud: for dashboard & visualizations
 
 ## Lessons Learned
