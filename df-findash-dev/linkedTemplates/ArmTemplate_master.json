@@ -17,10 +17,6 @@
 			"metadata": "Secure string for 'connectionString' of 'ls_sql_server'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sqlsv-findash-dev.database.windows.net;Initial Catalog=db-findash-dev;User ID=hieungo"
 		},
-		"ls_funcapp_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://funcapp-findash-dev.azurewebsites.net/api/"
-		},
 		"ls_funcapp_rest_api_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://api-mgmt-findash-dev.azure-api.net/funcapp-findash-dev/"
@@ -62,9 +58,6 @@
 					"ls_sql_server_connectionString": {
 						"value": "[parameters('ls_sql_server_connectionString')]"
 					},
-					"ls_funcapp_properties_typeProperties_url": {
-						"value": "[parameters('ls_funcapp_properties_typeProperties_url')]"
-					},
 					"lv_key_vault_properties_typeProperties_baseUrl": {
 						"value": "[parameters('lv_key_vault_properties_typeProperties_baseUrl')]"
 					},
@@ -74,26 +67,6 @@
 				}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "df-findash-dev_ArmTemplate_1",
-			"type": "Microsoft.Resources/deployments",
-			"apiVersion": "2018-02-01",
-			"properties": {
-				"mode": "incremental",
-				"templateLink": {
-					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
-					"contentVersion": "1.0.0.0"
-				},
-				"parameters": {
-					"factoryName": {
-						"value": "[parameters('factoryName')]"
-					}
-				}
-			},
-			"dependsOn": [
-				"[resourceId('Microsoft.Resources/deployments', 'df-findash-dev_ArmTemplate_0')]"
-			]
 		}
 	]
 }

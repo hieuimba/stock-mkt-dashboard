@@ -17,10 +17,6 @@
 			"metadata": "Secure string for 'connectionString' of 'ls_sql_server'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sqlsv-findash-dev.database.windows.net;Initial Catalog=db-findash-dev;User ID=hieungo"
 		},
-		"ls_funcapp_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://funcapp-findash-dev.azurewebsites.net/api/"
-		},
 		"ls_funcapp_rest_api_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://api-mgmt-findash-dev.azure-api.net/funcapp-findash-dev/"
@@ -244,8 +240,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"folder": {
 					"name": "Analytics"
@@ -591,8 +586,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"folder": {
 					"name": "Presentation"
@@ -886,8 +880,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"folder": {
 					"name": "Staging"
@@ -1384,8 +1377,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-07-07T15:45:02Z"
@@ -1407,6 +1399,9 @@
 						"name": "Raw",
 						"type": "ExecutePipeline",
 						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
@@ -1428,6 +1423,9 @@
 								]
 							}
 						],
+						"policy": {
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
@@ -1449,6 +1447,9 @@
 								]
 							}
 						],
+						"policy": {
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
@@ -1461,8 +1462,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-07-18T03:14:51Z"
@@ -1578,32 +1578,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_prices_alpaca_source_http')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_funcapp",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Json",
-				"typeProperties": {
-					"location": {
-						"type": "HttpServerLocation",
-						"relativeUrl": {
-							"value": "func-get-prices-alpaca?code=QExYJXb5FuMgUUC9Yk-pfh0x5sG5JyxblrFjboeDbeHBAzFulmweqw==",
-							"type": "Expression"
-						}
-					}
-				},
-				"schema": {}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/ds_prices_alpaca_source_rest_api')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1624,60 +1598,51 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_prices_yfin_source_http')]",
+			"name": "[concat(parameters('factoryName'), '/ds_prices_yfin_source_rest_api')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_funcapp",
+					"referenceName": "ls_funcapp_rest_api",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
-				"type": "Json",
+				"type": "RestResource",
 				"typeProperties": {
-					"location": {
-						"type": "HttpServerLocation",
-						"relativeUrl": {
-							"value": "func-get-prices-yfin?code=9icmNJb9M7CeueZ08Q4PuxyXGZpp-QatCjXT3nfTS8UaAzFuGXgZbg==",
-							"type": "Expression"
-						}
-					}
+					"relativeUrl": "func-get-prices-yfin"
 				},
-				"schema": {}
+				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp_rest_api')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_tickers_list_source_http')]",
+			"name": "[concat(parameters('factoryName'), '/ds_tickers_list_source_rest_api')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_funcapp",
+					"referenceName": "ls_funcapp_rest_api",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
 					"Exchange": {
-						"type": "String"
+						"type": "string"
 					}
 				},
 				"annotations": [],
-				"type": "Json",
+				"type": "RestResource",
 				"typeProperties": {
-					"location": {
-						"type": "HttpServerLocation",
-						"relativeUrl": {
-							"value": "@concat('func-get-tickers-list/',dataset().Exchange,'?code=Q_g8e-jjMwVLcToQsvr2gccq3Dc8RngzR9CwAPPJffZfAzFu1Qcl2g==')",
-							"type": "Expression"
-						}
+					"relativeUrl": {
+						"value": "@concat('func-get-tickers-list/',dataset().Exchange)",
+						"type": "Expression"
 					}
 				},
-				"schema": {}
+				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp_rest_api')]"
 			]
 		},
 		{
@@ -1702,21 +1667,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/lv_key_vault')]"
 			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ls_funcapp')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "HttpServer",
-				"typeProperties": {
-					"url": "[parameters('ls_funcapp_properties_typeProperties_url')]",
-					"enableServerCertificateValidation": true,
-					"authenticationType": "Anonymous"
-				}
-			},
-			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ls_funcapp_rest_api')]",
@@ -1865,54 +1815,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/get_tickers_list_EOW')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_prices_yfin_source_rest_api')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_funcapp_rest_api",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {
-					"relativeUrl": "func-get-prices-yfin"
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp_rest_api')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_tickers_list_source_rest_api')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_funcapp_rest_api",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"Exchange": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {
-					"relativeUrl": {
-						"value": "@concat('func-get-tickers-list/',dataset().Exchange)",
-						"type": "Expression"
-					}
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_funcapp_rest_api')]"
 			]
 		}
 	]
