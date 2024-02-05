@@ -17,7 +17,7 @@ darkgrey = "#171717"
 
 
 # Function to query data
-@st.cache_data(ttl=60 * 60 * 12, max_entries=20)
+@st.cache_data(ttl=60 * 60 * 24, max_entries=100)
 def query(query: str) -> pd.DataFrame:
     url = st.secrets["DB_URL"]
     request = {"query": query}
@@ -43,7 +43,7 @@ def clear_cache_if_needed(given_date_str: str):
     )
 
     # Check if the given date is less than the current Winnipeg date and time is past 5 PM
-    if given_date < current_date_winnipeg and current_datetime_winnipeg >= target_time:
+    if given_date < current_date_winnipeg and current_datetime_winnipeg >= target_time and current_date_winnipeg.weekday() not in [5, 6]:
         # Clear cache in Streamlit
         st.success(f"Data refreshed for {given_date_str}")
         st.cache_data.clear()
