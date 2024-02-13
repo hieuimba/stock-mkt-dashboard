@@ -10,7 +10,7 @@ This project provides a daily summary of the US Stock Market to assist traders a
 -   One-day returns of major indexes and sectors
 -   Sector correlations
 -   Stock market heatmap
--   Stock distributions
+-   Stock performance distributions
   
 ![stock-mkt-dashboard](https://github.com/hieuimba/stock-mkt-dashboard/assets/89481020/7a930a4f-18ed-4292-acd0-e33214f6ad17)
 
@@ -32,7 +32,7 @@ The following technologies are used to build the project:
 -   Azure Data Factory: for data connectors, scheduling, orchestration
 -   SQL Database: for staging environment & data warehouse
 -   Azure Blob Storage: for miscellaneous & config files
--   Azure Logic Apps: for web API
+-   Azure Logic Apps: for web API & authentication
 -   Streamlit Cloud: for dashboard & visualizations
 
 ## Lessons Learned
@@ -49,7 +49,7 @@ Making this app was my first time using Azure for a personal project, here are a
 ![Untitled](https://github.com/hieuimba/stock-mkt-dashboard/assets/89481020/8182e21c-b228-4e28-8c1c-8deed4ec822e)
 
 **Logic App:**
-- Logic App is great for building an API but is more expensive than Azure Functions. I find it’s worth it if you want the flow control operators and/or the built-in connectors for Azure services.
+- Logic App is great as a simple API but is more expensive than Azure Functions. I find it’s worth it if you want the flow control operators and/or the built-in connectors for other Azure services.
 - In this app, I used the pre-built Azure AD authentication connector to connect to the SQL warehouse, which eliminates the hassle of manually setting up a connection otherwise.
   
  ![Untitled2](https://github.com/hieuimba/stock-mkt-dashboard/assets/89481020/b66190a2-8d61-4b87-816f-4d5d8bf7100e)
