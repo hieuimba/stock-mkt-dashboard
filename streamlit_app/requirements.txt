@@ -2,4 +2,3 @@ streamlit
 requests
 pandas
 plotly
-st-pages

@@ -2,3 +2,5 @@
 base="dark"
 font = "sans serif"
 
+[client]
+showSidebarNavigation = false

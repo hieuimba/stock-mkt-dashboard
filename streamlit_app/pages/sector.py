@@ -8,6 +8,7 @@ import re
 st.set_page_config(layout="wide", page_title="Sector Analysis", page_icon="📈")
 st.markdown(config.condensed_page_style, unsafe_allow_html=True)
 
+config.Navbar()
 
 st.subheader("Sector Performance")
 

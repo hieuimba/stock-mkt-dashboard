@@ -16,6 +16,14 @@ white = "#fafafa"
 darkgrey = "#171717"
 
 
+def Navbar():
+    with st.sidebar:
+        st.page_link("streamlit_app.py", label="Broad Market")
+        st.page_link("pages/broad_mkt.py", label="Stock Analysis")
+        st.page_link("pages/sector.py", label="Sector Analysis")
+        st.page_link("pages/glossary.py", label="Glossary")
+
+
 # Function to query data
 @st.cache_data(ttl=60 * 60 * 24, max_entries=100)
 def query(query: str) -> pd.DataFrame:
@@ -43,7 +51,11 @@ def clear_cache_if_needed(given_date_str: str):
     )
 
     # Check if the given date is less than the current Winnipeg date and time is past 5 PM
-    if given_date < current_date_winnipeg and current_datetime_winnipeg >= target_time and current_date_winnipeg.weekday() not in [5, 6]:
+    if (
+        given_date < current_date_winnipeg
+        and current_datetime_winnipeg >= target_time
+        and current_date_winnipeg.weekday() not in [5, 6]
+    ):
         # Clear cache in Streamlit
         st.success(f"Data refreshed for {given_date_str}")
         st.cache_data.clear()
