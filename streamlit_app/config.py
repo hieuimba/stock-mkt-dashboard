@@ -19,8 +19,8 @@ darkgrey = "#171717"
 def Navbar():
     with st.sidebar:
         st.page_link("streamlit_app.py", label="Broad Market")
-        st.page_link("pages/broad_mkt.py", label="Stock Analysis")
         st.page_link("pages/sector.py", label="Sector Analysis")
+        st.page_link("pages/broad_mkt.py", label="Stock Analysis")
         st.page_link("pages/glossary.py", label="Glossary")
 
 
