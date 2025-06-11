@@ -127,3 +127,5 @@ def calculate_technical_indicators(df):
         df.loc[df["Ticker"] == ticker, "RVol"] = rvol
         df.loc[df["Ticker"] == ticker, "Order"] = order
     return df
+
+# trigger upgrade of library
