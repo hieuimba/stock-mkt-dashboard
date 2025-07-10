@@ -1,4 +1,7 @@
 # Stock Market Dashboard
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
+
 Data Engineering Project with Azure stack
 
 https://stock-mkt-dashboard.streamlit.app/
